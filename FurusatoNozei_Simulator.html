@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>給与・控除シミュレーター</title>
+<style>
+:root{--blue:#1a6b8a;--darkblue:#0f4d66;--orange:#e8a020;--green:#2a9d5c;--red:#c0392b;--bg:#f0f4f8;--card:#fff;--border:#dde3ea;--text:#2c3e50;--muted:#7f8c9a;--shadow:0 2px 14px rgba(0,0,0,0.08);--teal:#0d9488;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;}
+header{background:linear-gradient(135deg,var(--darkblue),var(--blue));color:#fff;padding:16px 28px;box-shadow:0 3px 16px rgba(0,0,0,0.2);}
+header h1{font-size:18px;font-weight:700;}header p{font-size:11px;opacity:.75;margin-top:2px;}
+.tab-bar{display:flex;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.08);position:sticky;top:0;z-index:100;}
+.tab-btn{flex:1;padding:14px 20px;border:none;background:none;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;font-family:inherit;}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);background:#f8fbfd;}
+.tab-btn:hover:not(.active){background:#f5f5f5;color:var(--text);}
+.pane{display:none;}.pane.active{display:block;}
+.wrap{display:grid;grid-template-columns:1fr 380px;gap:18px;max-width:1260px;margin:18px auto;padding:0 16px;}
+.card{background:var(--card);border-radius:12px;padding:18px 22px;box-shadow:var(--shadow);margin-bottom:14px;}
+.card-title{font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.8px;border-bottom:2px solid var(--blue);padding-bottom:6px;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.nb{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:var(--blue);color:#fff;border-radius:50%;font-size:10px;font-weight:700;flex-shrink:0;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.f{margin-bottom:10px;}
+.f>label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px;}
+.iw{position:relative;display:flex;align-items:center;}.iw .u{position:absolute;right:9px;font-size:11px;color:var(--muted);pointer-events:none;}
+input[type=number],select{width:100%;padding:7px 34px 7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;color:var(--text);background:#fafbfc;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237f8c9a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;}
+input[type=number]:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,107,138,.12);background:#fff;}
+.hint{font-size:10.5px;color:var(--muted);margin-top:2px;}.hint.acc{color:var(--green);font-weight:600;}.hint.warn{color:var(--orange);}
+.tr-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;}
+.tr-row .tl{font-size:13px;color:var(--text);flex:1;}
+.sw{position:relative;width:36px;height:20px;flex-shrink:0;}.sw input{opacity:0;width:0;height:0;}
+.swsl{position:absolute;inset:0;background:var(--border);border-radius:20px;cursor:pointer;transition:.2s;}
+.swsl::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+input:checked+.swsl{background:var(--blue);}input:checked+.swsl::before{transform:translateX(16px);}
+.dep-list{display:flex;flex-direction:column;gap:7px;margin-bottom:7px;}
+.dep-row{background:#f7fafc;border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;}
+.dep-row.ov{background:#fffbf5;border-color:#f0c878;}
+.dep-row>div>label{font-size:10px;color:var(--muted);font-weight:600;display:block;margin-bottom:2px;text-transform:uppercase;}
+.dep-row select{padding:5px 28px 5px 8px;font-size:12px;}
+.add-btn{background:none;border:1.5px dashed var(--blue);color:var(--blue);border-radius:7px;padding:6px 14px;font-size:12px;cursor:pointer;width:100%;transition:all .2s;}
+.add-btn:hover{background:rgba(26,107,138,.06);}
+.del-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:2px 5px;border-radius:4px;line-height:1;align-self:center;}.del-btn:hover{background:#fde8e6;}
+.coll-h{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;font-size:13px;padding:5px 0;color:var(--text);}
+.coll-h::after{content:'▸';font-size:10px;color:var(--muted);transition:transform .2s;}
+.coll-h.open::after{transform:rotate(90deg);}
+.coll-b{display:none;margin-top:8px;padding-top:4px;}.coll-b.open{display:block;}
+.snote{background:#f0f7ff;border-left:3px solid var(--blue);padding:6px 10px;border-radius:0 5px 5px 0;font-size:11px;color:#34495e;margin-bottom:10px;}
+.wnote{background:#fffaf0;border-left:3px solid var(--orange);padding:6px 10px;border-radius:0 5px 5px 0;font-size:11px;color:#7d5a20;margin-bottom:10px;}
+.r-panel{position:sticky;top:70px;}
+.hero{background:linear-gradient(135deg,var(--darkblue),var(--blue));border-radius:14px;padding:22px 20px;color:#fff;text-align:center;box-shadow:0 8px 28px rgba(26,107,138,.35);margin-bottom:12px;}
+.hero-lbl{font-size:11px;opacity:.8;text-transform:uppercase;letter-spacing:.7px;}
+.hero-amt{font-size:44px;font-weight:800;letter-spacing:-1px;line-height:1;margin:6px 0 2px;}
+.hero-sub{font-size:11px;opacity:.65;margin-top:2px;}
+.hero-row{background:var(--orange);border-radius:9px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:13px;}
+.hero-row .hl{font-size:11px;opacity:.9;}.hero-row .hv{font-size:19px;font-weight:800;}
+.rcard{background:#fff;border-radius:10px;padding:13px 17px;box-shadow:var(--shadow);margin-bottom:10px;}
+.rcard h3{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid #f0f4f8;font-size:12px;}
+.row:last-child{border-bottom:none;}.row .n{flex:1;color:var(--text);}
+.row .v{font-weight:600;color:var(--blue);text-align:right;min-width:90px;}.row .v.off{color:var(--muted);font-weight:400;}.row .v.g{color:var(--green);}.row .v.o{color:var(--orange);}
+.row.bold .n,.row.bold .v{font-weight:700;font-size:13px;color:var(--text);}
+.pb-w{background:#e8ecf0;border-radius:6px;overflow:hidden;height:6px;margin-top:6px;}
+.pb{height:100%;background:linear-gradient(90deg,var(--blue),var(--orange));border-radius:6px;transition:width .3s;}
+.pb.over{background:linear-gradient(90deg,var(--red),#e74c3c);}
+.nbox{background:#fffaf0;border:1.5px solid var(--orange);border-radius:8px;padding:8px 12px;font-size:11px;color:#7d5a20;line-height:1.6;margin-top:8px;}
+.calc-btn{width:100%;background:var(--blue);color:#fff;border:none;border-radius:9px;padding:12px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:background .2s;margin-top:4px;}
+.calc-btn:hover{background:var(--darkblue);}
+@media(max-width:880px){.wrap{grid-template-columns:1fr;}.r-panel{position:static;}}
+.step-tag{display:inline-block;background:#e8f4f8;color:var(--blue);font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;margin-left:6px;vertical-align:middle;}
+.acc-badge{display:inline-block;background:#e8f7ef;color:var(--green);font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:6px;}
+.h-hero{background:linear-gradient(135deg,#0d9488,#10b981);border-radius:14px;padding:22px 20px;color:#fff;text-align:center;box-shadow:0 8px 28px rgba(13,148,136,.35);margin-bottom:12px;}
+.h-hero .hero-lbl{opacity:.85;}.h-hero .hero-amt{font-size:38px;}
+.ref-btn{width:100%;background:linear-gradient(135deg,#0d9488,#10b981);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:opacity .2s;font-family:inherit;}
+.ref-btn:hover{opacity:.85;}
+.ins-type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.ins-type-btn{border:2px solid var(--border);background:#fff;border-radius:8px;padding:10px 4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;text-align:center;transition:all .2s;font-family:inherit;line-height:1.4;}
+.ins-type-btn.sel{border-color:var(--teal);color:var(--teal);background:#f0fdfb;}
+.ins-type-btn:hover{border-color:#aaa;}
+.h-detail{background:#fff;border-radius:10px;padding:13px 17px;box-shadow:var(--shadow);margin-bottom:10px;}
+.h-detail h3{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+</style>
+</head>
+<body>
+<header>
+  <h1>📊 給与・控除シミュレーター</h1>
+  <p>ふるさと納税上限計算 &amp; 社会保険料シミュレーション | 2025年度版</p>
+</header>
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="f">🏠 ふるさと納税</button>
+  <button class="tab-btn" data-tab="h">🏥 社会保険料</button>
+</div>
+
+<!-- ===== TAB 1: ふるさと納税 ===== -->
+<div id="pane-f" class="pane active">
+<div class="wrap">
+<div><!-- LEFT -->
+
+<div class="card">
+  <div class="card-title"><span class="nb">1</span>💼 年収・社会保険料<span class="acc-badge">最重要</span></div>
+  <div class="snote">💡 <strong>源泉徴収票</strong>の「支払金額」と「社会保険料等の金額」を入力すると最高精度になります</div>
+  <div class="g2">
+    <div class="f"><label>年収（給与収入）<span class="step-tag">支払金額</span></label>
+      <div class="iw"><input type="number" id="income" value="" min="0" max="10000" step="10"><span class="u">万円</span></div>
+    </div>
+    <div class="f"><label>社会保険料<span class="step-tag">源泉票に記載</span></label>
+      <div class="iw"><input type="number" id="si" value="" min="0" max="500" step="0.1" placeholder="空欄=自動計算"><span class="u">万円</span></div>
+      <div class="hint acc">源泉徴収票から入力 or 社保タブで計算</div>
+    </div>
+  </div>
+  <div id="si_auto_info" class="hint" style="margin-top:-4px;margin-bottom:6px;color:var(--muted)"></div>
+  <div class="f" style="margin-top:4px;">
+    <div class="tr-row">
+      <label class="tl" for="kaigo_flag">40歳以上（介護保険料あり）</label>
+      <label class="sw"><input type="checkbox" id="kaigo_flag"><span class="swsl"></span></label>
+    </div>
+    <div class="hint">40歳以上は介護保険料が社会保険に加算されます（自動計算の場合）</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="nb">2</span>🛡️ 生命・損害保険料控除</div>
+  <div class="coll-h" id="ins_new_h">生命保険料（新制度 2012年以降契約）</div>
+  <div class="coll-b" id="ins_new_b">
+    <div class="snote">3区分それぞれ独立。所得税上限各4万 / 住民税上限各2.8万</div>
+    <div class="g3">
+      <div class="f"><label>一般生命</label><div class="iw"><input type="number" id="ins_ln" value="0" min="0" step="1000"><span class="u">円</span></div></div>
+      <div class="f"><label>介護医療</label><div class="iw"><input type="number" id="ins_cn" value="0" min="0" step="1000"><span class="u">円</span></div></div>
+      <div class="f"><label>個人年金</label><div class="iw"><input type="number" id="ins_an" value="0" min="0" step="1000"><span class="u">円</span></div></div>
+    </div>
+  </div>
+  <div class="coll-h" id="ins_old_h" style="margin-top:8px">生命保険料（旧制度 2011年以前契約）</div>
+  <div class="coll-b" id="ins_old_b">
+    <div class="snote">2区分それぞれ独立。所得税上限各5万 / 住民税上限各3.5万</div>
+    <div class="g2">
+      <div class="f"><label>一般生命（旧）</label><div class="iw"><input type="number" id="ins_lo" value="0" min="0" step="1000"><span class="u">円</span></div></div>
+      <div class="f"><label>個人年金（旧）</label><div class="iw"><input type="number" id="ins_ao" value="0" min="0" step="1000"><span class="u">円</span></div></div>
+    </div>
+  </div>
+  <div class="g2" style="margin-top:10px">
+    <div class="f"><label>地震保険料（年間）</label>
+      <div class="iw"><input type="number" id="quake" value="0" min="0" step="1000"><span class="u">円</span></div>
+      <div class="hint">所得税1/2上限5万 / 住民税1/4上限2.5万</div>
+    </div>
+    <div class="f"><label>旧長期損害保険料</label>
+      <div class="iw"><input type="number" id="quake_o" value="0" min="0" step="1000"><span class="u">円</span></div>
+      <div class="hint">2007年以前契約・10年以上・満期返戻あり</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="nb">3</span>👫 配偶者</div>
+  <div class="f"><label>配偶者区分</label>
+    <select id="sp_type">
+      <option value="none">配偶者なし</option>
+      <option value="d">配偶者控除（配偶者所得48万以下）</option>
+      <option value="s">配偶者特別控除（配偶者所得48〜133万）</option>
+    </select>
+  </div>
+  <div id="sp_inc_w" style="display:none">
+    <div class="f"><label>配偶者の合計所得</label>
+      <div class="iw"><input type="number" id="sp_inc" value="80" min="48" max="133" step="1"><span class="u">万円</span></div>
+      <div class="hint">給与収入→所得目安: 年収100万≒所得45万, 150万≒95万</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="nb">4</span>👪 国内扶養親族</div>
+  <div class="dep-list" id="dom-list"></div>
+  <button class="add-btn" id="add-dom-btn">＋ 国内扶養を追加</button>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="nb">5</span>✈️ 海外扶養親族（非居住者）</div>
+  <div class="wnote"><strong>2023年改正：</strong>30〜69歳は「留学生」「障害者」「年間38万円以上の送金」のいずれかに該当しないと控除不可。確定申告に親族関係書類・送金記録の添付が必要。</div>
+  <div class="dep-list" id="ov-list"></div>
+  <button class="add-btn" id="add-ov-btn">＋ 海外扶養を追加</button>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="nb">6</span>📋 その他の控除</div>
+  <div class="f"><label>iDeCo 年間掛金</label>
+    <div class="iw"><input type="number" id="ideco" value="0" min="0" max="816000" step="1000"><span class="u">円</span></div>
+    <div class="hint">全額所得控除。会社員（企業DC無）上限年27.6万円</div>
+  </div>
+  <div class="f"><label>医療費控除（年間医療費合計）</label>
+    <div class="iw"><input type="number" id="med" value="0" min="0" step="10000"><span class="u">円</span></div>
+    <div class="hint">10万円超（または総所得×5%超）の部分が控除対象、上限200万</div>
+  </div>
+  <div class="tr-row">
+    <label class="tl" for="selfmed_sw">セルフメディケーション税制（医療費控除と選択）</label>
+    <label class="sw"><input type="checkbox" id="selfmed_sw"><span class="swsl"></span></label>
+  </div>
+  <div id="sm_w" style="display:none;margin-top:7px">
+    <div class="f"><label>特定OTC購入額（12,001円〜88,000円が控除対象）</label>
+      <div class="iw"><input type="number" id="sm_amt" value="20000" min="12001" step="1000"><span class="u">円</span></div>
+    </div>
+  </div>
+  <div style="border-top:1px solid var(--border);margin:11px 0"></div>
+  <div class="tr-row"><label class="tl" for="dis_sw">障害者控除</label>
+    <label class="sw"><input type="checkbox" id="dis_sw"><span class="swsl"></span></label>
+  </div>
+  <div id="dis_w" style="display:none;margin-top:6px">
+    <div class="f"><label>障害区分</label>
+      <select id="dis_type">
+        <option value="n">普通障害者（27万/26万）</option>
+        <option value="s">特別障害者（40万/30万）</option>
+        <option value="t">同居特別障害者（75万/53万）</option>
+      </select>
+    </div>
+  </div>
+  <div style="border-top:1px solid var(--border);margin:11px 0"></div>
+  <div class="g2">
+    <div class="tr-row"><label class="tl" for="sp_sw">ひとり親控除（35万/30万）</label>
+      <label class="sw"><input type="checkbox" id="sp_sw"><span class="swsl"></span></label>
+    </div>
+    <div class="tr-row"><label class="tl" for="wid_sw">寡婦控除（27万/26万）</label>
+      <label class="sw"><input type="checkbox" id="wid_sw"><span class="swsl"></span></label>
+    </div>
+    <div class="tr-row"><label class="tl" for="stw_sw">勤労学生控除（27万/26万）</label>
+      <label class="sw"><input type="checkbox" id="stw_sw"><span class="swsl"></span></label>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="nb">7</span>🎁 住宅ローン・寄付状況</div>
+  <div class="g2">
+    <div class="f"><label>住宅ローン控除（住民税分）</label>
+      <div class="iw"><input type="number" id="hloan" value="0" min="0" max="200000" step="1000"><span class="u">円</span></div>
+      <div class="hint">住民税上限9.75万円（特例は13.65万円）</div>
+    </div>
+    <div class="f"><label>今年の寄付予定額</label>
+      <div class="iw"><input type="number" id="donation" value="0" min="0" step="1000"><span class="u">円</span></div>
+    </div>
+  </div>
+  <div class="f"><label>寄付先自治体数（ワンストップ特例は5以内）</label>
+    <div class="iw"><input type="number" id="cities" value="3" min="1" max="20" step="1"><span class="u">自治体</span></div>
+  </div>
+</div>
+
+</div><!-- END LEFT -->
+
+<!-- RIGHT: Results Panel -->
+<div class="r-panel">
+  <div class="hero">
+    <div class="hero-lbl">ふるさと納税 上限額（目安）</div>
+    <div class="hero-amt" id="r_limit">—</div>
+    <div class="hero-sub">円（2,000円自己負担を除く実質無料枠）</div>
+    <div class="hero-row">
+      <span class="hl">実質自己負担</span>
+      <span class="hv" id="r_net">—</span>
+    </div>
+  </div>
+  <div class="rcard">
+    <h3>📊 寄付進捗</h3>
+    <div id="r_use_txt" class="hint" style="font-size:12px;margin-bottom:6px">寄付予定額を入力すると表示されます</div>
+    <div class="pb-w"><div class="pb" id="r_pb" style="width:0%"></div></div>
+  </div>
+  <div class="rcard">
+    <h3>📐 課税所得・税率</h3>
+    <div id="r_base"></div>
+  </div>
+  <div class="rcard">
+    <h3>📋 所得控除一覧（所得税）</h3>
+    <div id="r_di"></div>
+  </div>
+  <div class="rcard">
+    <h3>📋 所得控除一覧（住民税）</h3>
+    <div id="r_dr"></div>
+  </div>
+  <div class="rcard">
+    <h3>💰 節税効果（ふるさと納税上限寄付時）</h3>
+    <div id="r_sav"></div>
+  </div>
+  <div class="nbox" id="r_notes"></div>
+</div><!-- END RIGHT -->
+
+</div><!-- END WRAP -->
+</div><!-- END PANE-F -->
+
+<!-- ===== TAB 2: 社会保険料 ===== -->
+<div id="pane-h" class="pane">
+<div class="wrap">
+<div><!-- LEFT: Input -->
+
+<div class="card">
+  <div class="card-title"><span class="nb" style="background:var(--teal)">1</span>🏥 健康保険の種類</div>
+  <div class="ins-type-grid">
+    <button class="ins-type-btn sel" data-ins="kyokai">協会けんぽ<br><small>全国健康保険協会</small></button>
+    <button class="ins-type-btn" data-ins="kumiai">組合健保<br><small>会社の健保組合</small></button>
+    <button class="ins-type-btn" data-ins="kokuho">国民健康保険<br><small>自営業・無職</small></button>
+  </div>
+
+  <!-- 協会けんぽ: 都道府県選択 -->
+  <div id="ins-kyokai-opts">
+    <div class="f"><label>都道府県（事業所所在地）</label>
+      <select id="h_pref">
+        <option value="13">東京都（9.98%）</option>
+        <option value="01">北海道（10.21%）</option>
+        <option value="02">青森県（9.81%）</option>
+        <option value="03">岩手県（9.75%）</option>
+        <option value="04">宮城県（10.02%）</option>
+        <option value="05">秋田県（10.02%）</option>
+        <option value="06">山形県（9.92%）</option>
+        <option value="07">福島県（9.65%）</option>
+        <option value="08">茨城県（9.72%）</option>
+        <option value="09">栃木県（9.82%）</option>
+        <option value="10">群馬県（9.65%）</option>
+        <option value="11">埼玉県（9.70%）</option>
+        <option value="12">千葉県（9.68%）</option>
+        <option value="14">神奈川県（10.02%）</option>
+        <option value="15">新潟県（9.51%）</option>
+        <option value="16">富山県（9.57%）</option>
+        <option value="17">石川県（9.96%）</option>
+        <option value="18">福井県（9.91%）</option>
+        <option value="19">山梨県（10.04%）</option>
+        <option value="20">長野県（9.63%）</option>
+        <option value="21">岐阜県（9.91%）</option>
+        <option value="22">静岡県（9.68%）</option>
+        <option value="23">愛知県（10.01%）</option>
+        <option value="24">三重県（9.81%）</option>
+        <option value="25">滋賀県（9.90%）</option>
+        <option value="26">京都府（10.19%）</option>
+        <option value="27" selected>大阪府（10.29%）</option>
+        <option value="28">兵庫県（10.22%）</option>
+        <option value="29">奈良県（10.00%）</option>
+        <option value="30">和歌山県（9.95%）</option>
+        <option value="31">鳥取県（9.93%）</option>
+        <option value="32">島根県（9.93%）</option>
+        <option value="33">岡山県（10.10%）</option>
+        <option value="34">広島県（9.97%）</option>
+        <option value="35">山口県（10.06%）</option>
+        <option value="36">徳島県（10.23%）</option>
+        <option value="37">香川県（10.37%）</option>
+        <option value="38">愛媛県（10.20%）</option>
+        <option value="39">高知県（10.07%）</option>
+        <option value="40">福岡県（10.28%）</option>
+        <option value="41">佐賀県（10.77%）</option>
+        <option value="42">長崎県（10.11%）</option>
+        <option value="43">熊本県（10.44%）</option>
+        <option value="44">大分県（10.26%）</option>
+        <option value="45">宮崎県（9.95%）</option>
+        <option value="46">鹿児島県（10.25%）</option>
+        <option value="47">沖縄県（9.68%）</option>
+      </select>
+      <div class="hint">2025年度 協会けんぽ保険料率（労使折半後の本人負担率）</div>
+    </div>
+  </div>
+
+  <!-- 組合健保: 組合選択 + 料率入力 -->
+  <div id="ins-kumiai-opts" style="display:none">
+
+    <div class="f">
+      <label>健康保険料率（本人負担分 %）<span class="step-tag">給与明細を確認</span></label>
+      <div class="iw"><input type="number" id="h_kumiai_rate" value="4.900" min="1" max="10" step="0.001"><span class="u">%</span></div>
+      <div class="hint acc" id="h_kumiai_hint">給与明細の「健康保険料」÷ 標準報酬月額 で確認できます</div>
+    </div>
+  </div>
+
+  <!-- 国民健康保険: 手動入力のみ -->
+  <div id="ins-kokuho-opts" style="display:none">
+    <div class="wnote">国民健康保険は自治体ごとに計算が複雑なため、月額を直接入力してください。</div>
+    <div class="f"><label>国民健康保険料（月額・本人分）</label>
+      <div class="iw"><input type="number" id="h_kokuho_monthly" value="30000" min="0" step="1000"><span class="u">円</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="nb" style="background:var(--teal)">2</span>👤 年齢・月収</div>
+  <div class="f">
+    <div class="tr-row">
+      <label class="tl" for="h_kaigo">40歳以上（介護保険料あり）</label>
+      <label class="sw"><input type="checkbox" id="h_kaigo"><span class="swsl"></span></label>
+    </div>
+    <div class="hint">40歳以上65歳未満の方は介護保険料（2025年度: 全国一律1.73%）が加算されます</div>
+  </div>
+  <div class="f"><label>月収（税引前・交通費除く）</label>
+    <div class="iw"><input type="number" id="h_monthly" value="" min="1" max="2000000" step="any" oninput="var _y=parseFloat(this.value)||0;if(_y>0){document.getElementById('h_hyo').value=getHyo(_y);}hCalc();" onchange="var _y=parseFloat(this.value)||0;if(_y>0){document.getElementById('h_hyo').value=getHyo(_y);}hCalc();"><span class="u">円</span></div>
+    <div class="hint">入力後すぐに自動換算。動かない場合は <button type="button" onclick="var _y=parseFloat(document.getElementById('h_monthly').value)||0;if(_y>0)document.getElementById('h_hyo').value=getHyo(_y);hCalc();" style="font-size:11px;padding:2px 8px;border:1px solid var(--teal);border-radius:4px;background:#f0fdfb;color:var(--teal);cursor:pointer;">→ 計算する</button> を押してください</div>
+  </div>
+  <div class="f"><label>標準報酬月額（自動換算）</label>
+    <div class="iw"><input type="number" id="h_hyo" value="" min="1" max="1390000" step="any" oninput="hCalc()" onchange="hCalc()"><span class="u">円</span></div>
+    <div class="hint">直接編集も可能。月収から自動計算された値が入ります</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title"><span class="nb" style="background:var(--teal)">3</span>💼 雇用保険</div>
+  <div class="f"><label>事業の種類</label>
+    <select id="h_emp_type">
+      <option value="0.006">一般の事業（0.6%）</option>
+      <option value="0.007">農林水産・清酒製造の事業（0.7%）</option>
+      <option value="0.007b">建設の事業（0.7%）</option>
+    </select>
+  </div>
+  <div class="f"><label>月収（交通費含む・雇用保険の計算基礎）</label>
+    <div class="iw"><input type="number" id="h_wage_emp" value="" min="0" step="any"><span class="u">円</span></div>
+    <div class="hint">雇用保険は標準報酬ではなく実際の賃金に料率をかけます</div>
+  </div>
+</div>
+
+</div><!-- END LEFT -->
+
+<!-- RIGHT: Social Insurance Results -->
+<div class="r-panel">
+  <div class="h-hero">
+    <div class="hero-lbl">月額 社会保険料 合計（本人負担）</div>
+    <div class="hero-amt" id="h_total_monthly">—</div>
+    <div class="hero-sub">円 / 月</div>
+    <div class="hero-row" style="background:rgba(255,255,255,0.2)">
+      <span class="hl">年間合計</span>
+      <span class="hv" id="h_total_annual">—</span>
+    </div>
+  </div>
+
+  <div class="h-detail">
+    <h3>📋 内訳（月額）</h3>
+    <div id="h_breakdown"></div>
+  </div>
+
+  <div class="h-detail">
+    <h3>📐 計算の根拠</h3>
+    <div id="h_basis"></div>
+  </div>
+
+  <div style="margin-top:4px">
+    <button class="ref-btn" id="ref-to-furusato-btn">
+      🏠 この金額をふるさと納税タブに反映する
+    </button>
+    <div class="hint" style="text-align:center;margin-top:6px">ふるさと納税タブの「社会保険料」欄に年間合計を自動入力します</div>
+  </div>
+
+  <div class="h-detail" style="margin-top:10px">
+    <h3>ℹ️ 2025年度 保険料率</h3>
+    <div class="row"><span class="n">厚生年金保険料率（折半）</span><span class="v">9.15%</span></div>
+    <div class="row"><span class="n">介護保険料率（折半）</span><span class="v">0.865%</span></div>
+    <div class="row"><span class="n">協会けんぽ（大阪・折半）</span><span class="v">5.145%</span></div>
+    <div class="row" style="border-bottom:none"><span class="n">雇用保険（一般事業・本人）</span><span class="v">0.6%</span></div>
+  </div>
+
+  <div class="nbox" id="h_notes" style="margin-top:8px">
+    月収を入力すると社会保険料を自動計算します。<br>
+    結果は概算です。正確な金額は給与明細または所属の人事部門でご確認ください。
+  </div>
+</div><!-- END RIGHT -->
+
+</div><!-- END WRAP -->
+</div><!-- END PANE-H -->
+
+<script>
+// ===== SHARED HELPERS =====
+function gv(id,def){var v=parseFloat(document.getElementById(id).value);return isNaN(v)?(def||0):v;}
+function gs(id){return document.getElementById(id).value;}
+function gc(id){return document.getElementById(id).checked;}
+function setText(id,t){var el=document.getElementById(id);if(el)el.textContent=t;}
+function setHTML(id,h){var el=document.getElementById(id);if(el)el.innerHTML=h;}
+function fmt(n){return Math.round(n).toLocaleString('ja');}
+
+// ===== TAB SWITCHING =====
+document.querySelectorAll('.tab-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var tab=this.getAttribute('data-tab');
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.pane').forEach(function(p){p.classList.remove('active');});
+    this.classList.add('active');
+    document.getElementById('pane-'+tab).classList.add('active');
+  });
+});
+
+// ===== COLLAPSIBLE SECTIONS =====
+document.querySelectorAll('.coll-h').forEach(function(h){
+  h.addEventListener('click',function(){
+    var id=this.id.replace('_h','_b');
+    var body=document.getElementById(id);
+    if(body){this.classList.toggle('open');body.classList.toggle('open');}
+  });
+});
+
+// ===== FURUSATO TAB LOGIC =====
+var depCnt=0;
+function addDep(type){
+  depCnt++;
+  var id=depCnt;
+  var list=document.getElementById(type+'-list');
+  var div=document.createElement('div');
+  div.className='dep-row'+(type==='ov'?' ov':'');
+  div.id='dep'+id;
+  if(type==='dom'){
+    div.innerHTML='<div><label>区分</label><select id="dt'+id+'">'
+      +'<option value="g">一般扶養（16〜18歳/23〜69歳）</option>'
+      +'<option value="sp">特定扶養（19〜22歳）</option>'
+      +'<option value="e">老人扶養（70歳以上）</option>'
+      +'<option value="ce">同居老人扶養（70歳以上）</option>'
+      +'</select></div>'
+      +'<div><label>人数</label><select id="dn'+id+'">'
+      +'<option value="1">1人</option><option value="2">2人</option>'
+      +'<option value="3">3人</option></select></div>'
+      +'<button class="del-btn" onclick="document.getElementById(\'dep'+id+'\').remove();calc()">×</button>';
+  }else{
+    div.innerHTML='<div><label>年齢区分</label><select id="da'+id+'">'
+      +'<option value="u">16歳未満（控除対象外）</option>'
+      +'<option value="y">16〜29歳/70歳以上</option>'
+      +'<option value="m">30〜69歳（条件付き）</option>'
+      +'<option value="o">70歳以上</option>'
+      +'</select></div>'
+      +'<div><label>30-69歳の条件</label><select id="dc'+id+'">'
+      +'<option value="">該当なし</option>'
+      +'<option value="y">留学・障害・38万送金</option>'
+      +'</select></div>'
+      +'<button class="del-btn" onclick="document.getElementById(\'dep'+id+'\').remove();calc()">×</button>';
+  }
+  list.appendChild(div);
+  div.querySelectorAll('select').forEach(function(s){s.addEventListener('change',calc);});
+  calc();
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('add-dom-btn').addEventListener('click',function(){addDep('dom');});
+  document.getElementById('add-ov-btn').addEventListener('click',function(){addDep('ov');});
+  document.getElementById('sp_type').addEventListener('change',spChg);
+  document.getElementById('selfmed_sw').addEventListener('change',smChg);
+  document.getElementById('dis_sw').addEventListener('change',disChg);
+  document.querySelectorAll('input[type=number],select').forEach(function(el){
+    el.addEventListener('input',calc);el.addEventListener('change',calc);
+  });
+  document.querySelectorAll('input[type=checkbox]').forEach(function(el){
+    el.addEventListener('change',calc);
+  });
+  calc();hCalc();
+});
+
+function spChg(){document.getElementById('sp_inc_w').style.display=(gs('sp_type')==='s')?'block':'none';calc();}
+function smChg(){document.getElementById('sm_w').style.display=gc('selfmed_sw')?'block':'none';calc();}
+function disChg(){document.getElementById('dis_w').style.display=gc('dis_sw')?'block':'none';calc();}
+
+// ===== FURUSATO CALC FUNCTIONS =====
+function empDed(inc){
+  var tbl=[[1625000,550000],[1800000,inc*0.4],[3600000,inc*0.3+180000],
+    [6600000,inc*0.2+540000],[8500000,inc*0.1+1200000],[Infinity,1950000]];
+  for(var i=0;i<tbl.length;i++){if(inc<=tbl[i][0])return Math.min(tbl[i][1],1950000);}
+  return 1950000;
+}
+function estSI(inc,kaigo){
+  var hyo=Math.min(Math.max(Math.round(inc/12/1000)*1000,88000),1390000);
+  var kRate=kaigo?0.0173:0;
+  var h=hyo*(0.1029/2+kRate/2);
+  var nenkinHyo=Math.min(hyo,650000);
+  var n=nenkinHyo*0.183/2;
+  var ei=Math.min(Math.max(Math.round(inc/12),63000),1370000);
+  var emp=ei*0.006;
+  return (h+n+emp)*12;
+}
+function calcIns(ln,cn,an,lo,ao){
+  function newSlot(p){if(p<=20000)return p/2;if(p<=40000)return p/4+10000;if(p<=80000)return p/8+15000;return 40000;}
+  function newR(p){if(p<=12000)return p/2;if(p<=32000)return p/4+3000;if(p<=56000)return p/8+7000;return 14000;}
+  function oldSlot(p){if(p<=25000)return p/2;if(p<=50000)return p/4+12500;if(p<=100000)return p/8+25000;return 50000;}
+  function oldR(p){if(p<=15000)return p/2;if(p<=40000)return p/4+3750;if(p<=70000)return p/8+10000;return 17500;}
+  var ni=Math.min(newSlot(ln)+newSlot(cn)+newSlot(an),120000);
+  var nr=Math.min(newR(ln)+newR(cn)+newR(an),84000);
+  var oi=Math.min(oldSlot(lo)+oldSlot(ao),100000);
+  var or_=Math.min(oldR(lo)+oldR(ao),70000);
+  var ti=Math.min(ni+oi,120000),tr=Math.min(nr+or_,84000);
+  return{i:ti,r:tr};
+}
+function calcQuake(q,qo){
+  var qi=Math.min(q/2,25000);
+  var qoi=0;
+  if(qo>0){if(qo<=10000)qoi=qo/2;else if(qo<=20000)qoi=qo/4+2500;else qoi=7500;}
+  var ti=Math.min(qi+qoi,50000);
+  var tr=Math.min(Math.floor(q/4),25000)+Math.min(Math.floor(qo/4),25000);
+  tr=Math.min(tr,25000);
+  return{i:ti,r:tr};
+}
+function basicDed(salInc){
+  if(salInc<=24000000)return{i:480000,r:430000};
+  if(salInc<=24500000)return{i:320000,r:290000};
+  if(salInc<=25000000)return{i:160000,r:150000};
+  return{i:0,r:0};
+}
+function spouseDed(type,salInc,spInc){
+  if(type==='none')return{i:0,r:0};
+  if(type==='d'){
+    var di,dr;
+    if(salInc<=9000000){di=380000;dr=330000;}
+    else if(salInc<=9500000){di=260000;dr=220000;}
+    else if(salInc<=10000000){di=130000;dr=110000;}
+    else{di=0;dr=0;}
+    return{i:di,r:dr};
+  }
+  var s=spInc*10000;
+  var tbl=[[480000,380000,330000],[500000,360000,330000],[550000,310000,310000],
+    [600000,260000,260000],[650000,210000,210000],[700000,160000,160000],
+    [750000,110000,110000],[800000,60000,60000],[850000,30000,30000],[Infinity,0,0]];
+  var di=0,dr=0;
+  for(var i=0;i<tbl.length;i++){if(s<tbl[i][0]){di=tbl[i][1];dr=tbl[i][2];break;}}
+  if(salInc>10000000){di=0;dr=0;}
+  else if(salInc>9500000){di=Math.round(di/3);dr=Math.round(dr/3);}
+  else if(salInc>9000000){di=Math.round(di*2/3);dr=Math.round(dr*2/3);}
+  return{i:di,r:dr};
+}
+function domDeps(){
+  var ti=0,tr=0,tdiff=0;
+  document.querySelectorAll('#dom-list .dep-row').forEach(function(row){
+    var id=row.id.replace('dep','');
+    var v=gs('dt'+id);
+    var n=parseInt(gs('dn'+id))||1;
+    if(v==='g'){ti+=380000*n;tr+=330000*n;tdiff+=50000*n;}
+    else if(v==='sp'){ti+=630000*n;tr+=450000*n;tdiff+=180000*n;}
+    else if(v==='e'){ti+=480000*n;tr+=380000*n;tdiff+=100000*n;}
+    else if(v==='ce'){ti+=580000*n;tr+=450000*n;tdiff+=130000*n;}
+  });
+  return{i:ti,r:tr,diff:tdiff};
+}
+function ovDeps(){
+  var ti=0,tr=0;
+  document.querySelectorAll('#ov-list .dep-row').forEach(function(row){
+    var id=row.id.replace('dep','');
+    var age=gs('da'+id),cond=gs('dc'+id);
+    if(age==='u')return;
+    if(age==='m'&&!cond)return;
+    if(age==='o'){ti+=480000;tr+=380000;}
+    else{ti+=380000;tr+=330000;}
+  });
+  return{i:ti,r:tr};
+}
+function incomeTax(taxable){
+  if(taxable<=0)return{tax:0,rate:0.05};
+  var b=[[1950000,0.05,0],[3300000,0.10,97500],[6950000,0.20,427500],
+    [9000000,0.23,636000],[18000000,0.33,1536000],[40000000,0.40,2796000],[Infinity,0.45,4796000]];
+  for(var i=0;i<b.length;i++){if(taxable<=b[i][0])return{tax:taxable*b[i][1]-b[i][2],rate:b[i][1]};}
+  return{tax:0,rate:0.45};
+}
+function adjDeduct(taxRes,pdiff){
+  if(taxRes<=0)return 2500;
+  var adj;
+  if(taxRes<=2000000){adj=Math.min(pdiff*0.05,taxRes*0.05);}
+  else{adj=Math.max(0,pdiff*0.05-(taxRes-2000000)*0.05);}
+  return Math.max(Math.round(adj),2500);
+}
+
+function rows(arr){return arr.map(function(a){return '<div class="row"><span class="n">'+a[0]+'</span><span class="v">'+a[1]+'</span></div>';}).join('');}
+function dedRows(arr,total){
+  var h=arr.map(function(a){var v=a[1];return '<div class="row"><span class="n">'+a[0]+'</span><span class="v'+(v>0?'':' off')+'">'+( v>0?'▲'+fmt(v)+'円':'—')+'</span></div>';}).join('');
+  h+='<div class="row bold"><span class="n">合計控除額</span><span class="v">▲'+fmt(Math.round(total))+'円</span></div>';
+  return h;
+}
+function mkrow(n,v,cls,bold){return '<div class="row'+(bold?' bold':'')+'"><span class="n">'+n+'</span><span class="v '+(cls||'')+'">'+v+'</span></div>';}
+
+function calc(){
+  try{
+    var incRaw=document.getElementById('income').value;
+    if(incRaw===''||incRaw===null||parseFloat(incRaw)<=0){
+      setText('r_limit','—');setText('r_net','—');
+      var pb=document.getElementById('r_pb');if(pb)pb.style.width='0%';
+      setText('r_use_txt','年収を入力すると表示されます');
+      setHTML('r_base','');setHTML('r_di','');setHTML('r_dr','');setHTML('r_sav','');
+      setHTML('r_notes','💡 年収（給与収入）を入力してください。');
+      setText('si_auto_info','');
+      return;
+    }
+    var incM=gv('income',0),inc=incM*10000;
+    var siVal=document.getElementById('si').value;
+    var siInp=(siVal===''||siVal===null)?-1:parseFloat(siVal);
+    var kaigo=gc('kaigo_flag');
+    var si=(isNaN(siInp)||siInp<0)?estSI(inc,kaigo):siInp*10000;
+    var siIsAuto=(isNaN(siInp)||siInp<0);
+    if(siIsAuto){setText('si_auto_info','社会保険料 自動推計: 約'+fmt(Math.round(si/10000))+'万円（健保+厚年+雇保）');}
+    else{setText('si_auto_info','');}
+    var ed=empDed(inc),salInc=inc-ed,basic=basicDed(salInc);
+    var ins=calcIns(gv('ins_ln'),gv('ins_cn'),gv('ins_an'),gv('ins_lo'),gv('ins_ao'));
+    var quake=calcQuake(gv('quake'),gv('quake_o'));
+    var spType=gs('sp_type'),sp=spouseDed(spType,salInc,gv('sp_inc',80));
+    var dd=domDeps(),od=ovDeps(),ideco=gv('ideco',0);
+    var medTotal=gv('med',0),medD=0;
+    if(gc('selfmed_sw')){medD=Math.min(Math.max(0,gv('sm_amt',0)-12000),88000);}
+    else if(medTotal>0){medD=Math.min(Math.max(0,medTotal-Math.min(100000,salInc*0.05)),2000000);}
+    var hlRes=gv('hloan',0);
+    var disI=0,disR=0;
+    if(gc('dis_sw')){var dt=gs('dis_type');if(dt==='n'){disI=270000;disR=260000;}else if(dt==='s'){disI=400000;disR=300000;}else{disI=750000;disR=530000;}}
+    var spI=gc('sp_sw')?350000:0,spR=gc('sp_sw')?300000:0;
+    var wI=gc('wid_sw')?270000:0,wR=gc('wid_sw')?260000:0;
+    var stI=gc('stw_sw')?270000:0,stR=gc('stw_sw')?260000:0;
+    var pdiff=(basic.i-basic.r)+(sp.i-sp.r)+dd.diff+(od.i-od.r)+(disI-disR)+(spI-spR)+(wI-wR)+(stI-stR);
+    var sumI=si+basic.i+ins.i+quake.i+sp.i+dd.i+od.i+ideco+medD+disI+spI+wI+stI;
+    var taxInc=Math.max(0,Math.floor((salInc-sumI)/1000)*1000);
+    var itax=incomeTax(taxInc);
+    var sumR=si+basic.r+ins.r+quake.r+sp.r+dd.r+od.r+ideco+medD+disR+spR+wR+stR;
+    var taxRes=Math.max(0,Math.floor((salInc-sumR)/1000)*1000);
+    var resBase=Math.floor(taxRes*0.10);
+    var adj=adjDeduct(taxRes,pdiff);
+    var resAlloc=Math.max(0,resBase-adj-hlRes);
+    var denom=0.9-itax.rate*1.021,limit=2000;
+    if(denom>0&&resAlloc>0){limit=Math.floor(resAlloc*0.20/denom)+2000;}
+    setText('r_limit',fmt(limit));
+    var net=2000-Math.floor((limit-2000)*0.30);
+    setText('r_net',(net<0?'▲'+fmt(-net):fmt(net))+'円');
+    var don=gv('donation',0),cities=gv('cities',3);
+    if(don>0&&limit>0){
+      var pct=Math.min(don/limit*100,150),bar=document.getElementById('r_pb');
+      if(bar){bar.style.width=Math.min(pct,100)+'%';bar.className='pb'+(pct>100?' over':'');}
+      var rem=limit-don;
+      setHTML('r_use_txt','予定 <strong>'+fmt(don)+'円</strong> / 上限 <strong>'+fmt(limit)+'円</strong> — '+(rem>=0?'あと <strong style="color:var(--green)">'+fmt(rem)+'円</strong>':'<strong style="color:var(--red)">'+fmt(-rem)+'円超過</strong>'));
+    }else{var pb=document.getElementById('r_pb');if(pb)pb.style.width='0%';setText('r_use_txt','寄付予定額を入力すると表示されます');}
+    var siMark=siIsAuto?'<span style="font-size:10px;color:var(--muted)">(自動)</span>':'';
+    setHTML('r_base',rows([['給与収入',fmt(inc)+'円'],['▲給与所得控除',fmt(ed)+'円'],['給与所得',fmt(salInc)+'円'],['▲社会保険料控除',fmt(Math.round(si))+'円'+siMark],['所得税 課税所得','<strong>'+fmt(taxInc)+'円</strong>'],['限界税率（ふるさと納税計算用）','<strong>'+(itax.rate*100).toFixed(0)+'%</strong>'],['住民税 課税所得','<strong>'+fmt(taxRes)+'円</strong>'],['住民税所得割（10%）',fmt(resBase)+'円'],['▲調整控除',fmt(adj)+'円'],['▲住宅ローン控除（住民税）',fmt(hlRes)+'円'],['住民税所得割（計算用）','<strong>'+fmt(resAlloc)+'円</strong>']]));
+    var di=[['基礎控除',basic.i,0],['社会保険料控除',Math.round(si),0],['生命保険料控除',ins.i,0],['地震保険料控除',quake.i,0],['配偶者控除/特別控除',sp.i,0],['国内扶養控除',dd.i,0],['海外扶養控除',od.i,0],['iDeCo掛金控除',ideco,0],['医療費控除'+(gc('selfmed_sw')?' (SMT)':''),medD,0],['障害者控除',disI,0],['ひとり親控除',spI,0],['寡婦控除',wI,0],['勤労学生控除',stI,0]];
+    setHTML('r_di',dedRows(di,sumI));
+    var dr=[['基礎控除',basic.r,0],['社会保険料控除',Math.round(si),0],['生命保険料控除',ins.r,0],['地震保険料控除',quake.r,0],['配偶者控除/特別控除',sp.r,0],['国内扶養控除',dd.r,0],['海外扶養控除',od.r,0],['iDeCo掛金控除',ideco,0],['医療費控除'+(gc('selfmed_sw')?' (SMT)':''),medD,0],['障害者控除',disR,0],['ひとり親控除',spR,0],['寡婦控除',wR,0],['勤労学生控除',stR,0]];
+    setHTML('r_dr',dedRows(dr,sumR));
+    var base=Math.max(0,limit-2000),sIt=Math.floor(base*itax.rate*1.021),sRb=Math.floor(base*0.10),sRs=Math.floor(base*(0.90-itax.rate*1.021));
+    setHTML('r_sav',mkrow('所得税還付（復興特別所得税込）','+'+fmt(sIt)+'円','g')+mkrow('住民税控除（基本分10%）','+'+fmt(sRb)+'円','g')+mkrow('住民税控除（特例分）','+'+fmt(sRs)+'円','g')+mkrow('控除合計','+'+fmt(sIt+sRb+sRs)+'円','g',true)+mkrow('自己負担（実質コスト）','2,000円','o',true));
+    var notes=[];
+    if(siIsAuto)notes.push('📌 社会保険料は自動概算です。「社会保険料タブ」で正確な計算後に反映するか、源泉徴収票の値を直接入力してください。');
+    if(cities>5)notes.push('⚠️ '+cities+'自治体 → ワンストップ特例不可。確定申告が必要です。');
+    else notes.push('✅ '+cities+'自治体以内 → ワンストップ特例利用可（確定申告不要）。');
+    if(od.i>0)notes.push('✈️ 海外扶養を計上。確定申告に親族関係書類・送金記録の添付が必要です。');
+    if(hlRes>0)notes.push('🏠 住宅ローン控除（住民税分）が上限計算に影響しています。');
+    if(ideco>0)notes.push('💡 iDeCoは全額所得控除。課税所得が下がり、ふるさと納税上限にも影響します。');
+    notes.push('📊 この計算は概算です。最終確認は源泉徴収票の実数値で行ってください。');
+    setHTML('r_notes',notes.join('<br>'));
+  }catch(e){console.error('calc error:',e);setHTML('r_notes','計算エラー: '+e.message);}
+}
+
+// ===== 社会保険料 CALC =====
+// 協会けんぽ 2025年度 保険料率（本人負担 = 全体 / 2）
+var KYOKAI_RATES = {
+  '01':0.1021,'02':0.0981,'03':0.0975,'04':0.1002,'05':0.1002,'06':0.0992,'07':0.0965,
+  '08':0.0972,'09':0.0982,'10':0.0965,'11':0.0970,'12':0.0968,'13':0.0998,'14':0.1002,
+  '15':0.0951,'16':0.0957,'17':0.0996,'18':0.0991,'19':0.1004,'20':0.0963,'21':0.0991,
+  '22':0.0968,'23':0.1001,'24':0.0981,'25':0.0990,'26':0.1019,'27':0.1029,'28':0.1022,
+  '29':0.1000,'30':0.0995,'31':0.0993,'32':0.0993,'33':0.1010,'34':0.0997,'35':0.1006,
+  '36':0.1023,'37':0.1037,'38':0.1020,'39':0.1007,'40':0.1028,'41':0.1077,'42':0.1011,
+  '43':0.1044,'44':0.1026,'45':0.0995,'46':0.1025,'47':0.0968
+};
+
+// 標準報酬月額 等級表（令和8年4月版 / 全50等級）
+// 出典: cells.co.jp 都道府県別・標準報酬月額表
+// 形式: [報酬月額_未満(円), 標準報酬月額(円)]
+var HYO_TABLE = [
+  [63000,58000],      // 等級1: 63,000未満
+  [73000,68000],      // 等級2: 63,000〜73,000未満
+  [83000,78000],      // 等級3: 73,000〜83,000未満
+  [93000,88000],      // 等級4: 83,000〜93,000未満
+  [101000,98000],     // 等級5: 93,000〜101,000未満
+  [107000,104000],    // 等級6: 101,000〜107,000未満
+  [114000,110000],    // 等級7: 107,000〜114,000未満
+  [122000,118000],    // 等級8: 114,000〜122,000未満
+  [130000,126000],    // 等級9: 122,000〜130,000未満
+  [138000,134000],    // 等級10: 130,000〜138,000未満
+  [146000,142000],    // 等級11: 138,000〜146,000未満
+  [155000,150000],    // 等級12: 146,000〜155,000未満
+  [165000,160000],    // 等級13: 155,000〜165,000未満
+  [175000,170000],    // 等級14: 165,000〜175,000未満
+  [185000,180000],    // 等級15: 175,000〜185,000未満
+  [195000,190000],    // 等級16: 185,000〜195,000未満
+  [210000,200000],    // 等級17: 195,000〜210,000未満
+  [230000,220000],    // 等級18: 210,000〜230,000未満
+  [250000,240000],    // 等級19: 230,000〜250,000未満
+  [270000,260000],    // 等級20: 250,000〜270,000未満
+  [290000,280000],    // 等級21: 270,000〜290,000未満
+  [310000,300000],    // 等級22: 290,000〜310,000未満
+  [330000,320000],    // 等級23: 310,000〜330,000未満
+  [350000,340000],    // 等級24: 330,000〜350,000未満
+  [370000,360000],    // 等級25: 350,000〜370,000未満
+  [395000,380000],    // 等級26: 370,000〜395,000未満
+  [425000,410000],    // 等級27: 395,000〜425,000未満
+  [455000,440000],    // 等級28: 425,000〜455,000未満
+  [485000,470000],    // 等級29: 455,000〜485,000未満
+  [515000,500000],    // 等級30: 485,000〜515,000未満
+  [545000,530000],    // 等級31: 515,000〜545,000未満
+  [575000,560000],    // 等級32: 545,000〜575,000未満
+  [605000,590000],    // 等級33: 575,000〜605,000未満
+  [635000,620000],    // 等級34: 605,000〜635,000未満
+  [665000,650000],    // 等級35: 635,000〜665,000未満（厚生年金上限）
+  [695000,680000],    // 等級36: 665,000〜695,000未満
+  [730000,710000],    // 等級37: 695,000〜730,000未満
+  [770000,750000],    // 等級38: 730,000〜770,000未満
+  [810000,790000],    // 等級39: 770,000〜810,000未満
+  [855000,830000],    // 等級40: 810,000〜855,000未満
+  [905000,880000],    // 等級41: 855,000〜905,000未満
+  [955000,930000],    // 等級42: 905,000〜955,000未満
+  [1005000,980000],   // 等級43: 955,000〜1,005,000未満
+  [1055000,1030000],  // 等級44: 1,005,000〜1,055,000未満
+  [1115000,1090000],  // 等級45: 1,055,000〜1,115,000未満
+  [1175000,1150000],  // 等級46: 1,115,000〜1,175,000未満
+  [1235000,1210000],  // 等級47: 1,175,000〜1,235,000未満
+  [1295000,1270000],  // 等級48: 1,235,000〜1,295,000未満
+  [1355000,1330000],  // 等級49: 1,295,000〜1,355,000未満
+  [Infinity,1390000]  // 等級50: 1,355,000以上
+];
+
+function getHyo(monthly_yen){
+  // 報酬月額（円）が「未満」の境界と比較（以上〜未満）
+  for(var i=0;i<HYO_TABLE.length;i++){if(monthly_yen<HYO_TABLE[i][0])return HYO_TABLE[i][1];}
+  return 1390000;
+}
+function updateHyo(val){
+  var yen=parseFloat(val)||0;
+  var el=document.getElementById('h_hyo');
+  if(yen>0&&el){el.value=getHyo(yen);}
+  hCalc();
+}
+
+function hCalc(){
+  try{
+    var monthlyRaw=document.getElementById('h_monthly').value;
+    var hyoRaw=document.getElementById('h_hyo').value;
+    if((monthlyRaw===''||monthlyRaw===null)&&(hyoRaw===''||hyoRaw===null||parseFloat(hyoRaw)<=0)){
+      setText('h_total_monthly','—');setText('h_total_annual','—');
+      setHTML('h_breakdown','');setHTML('h_basis','');
+      setHTML('h_notes','💡 月収（税引前）を入力してください。標準報酬月額が自動換算されます。');
+      document.getElementById('ref-to-furusato-btn')._annual=0;
+      return;
+    }
+    var insType=document.querySelector('.ins-type-btn.sel').getAttribute('data-ins');
+    var kaigo=gc('h_kaigo');
+    var hyo=gv('h_hyo',360000);
+    var nenkinHyo=Math.min(hyo,650000);
+    var wage=gv('h_wage_emp',0);  // 円単位で入力
+    var empTypeVal=gs('h_emp_type');
+    var empRate=parseFloat(empTypeVal)||0.006;
+    var KAIGO=0.01730;
+    var NENKIN=0.1830;
+
+    var kenpo=0,kenpoLabel='';
+    var kaigoPrem=kaigo?Math.round(hyo*(KAIGO/2)):0;
+    var nenkin=Math.round(nenkinHyo*(NENKIN/2));
+    var emp=Math.round(wage*empRate);
+
+    if(insType==='kyokai'){
+      var pref=gs('h_pref');
+      var rate=KYOKAI_RATES[pref]||0.1029;
+      kenpo=Math.round(hyo*(rate/2));
+      kenpoLabel='協会けんぽ（'+(rate*100).toFixed(2)+'% / 本人'+(rate/2*100).toFixed(3)+'%）';
+    }else if(insType==='kumiai'){
+      var r=gv('h_kumiai_rate',4.900)/100;
+      kenpo=Math.round(hyo*r);
+      kenpoLabel='組合健保（本人負担 '+(r*100).toFixed(3)+'%）';
+    }else{
+      kenpo=gv('h_kokuho_monthly',30000);
+      kaigoPrem=0;
+      kenpoLabel='国民健康保険（手動入力）';
+    }
+
+    var total=kenpo+(kaigo?kaigoPrem:0)+nenkin+emp;
+    var annual=total*12;
+
+    setText('h_total_monthly',fmt(total));
+    setText('h_total_annual',fmt(annual)+'円');
+
+    var br='';
+    br+='<div class="row"><span class="n">健康保険料（本人）</span><span class="v">'+fmt(kenpo)+'円</span></div>';
+    if(kaigo&&insType!=='kokuho'){br+='<div class="row"><span class="n">介護保険料（本人）</span><span class="v">'+fmt(kaigoPrem)+'円</span></div>';}
+    if(insType!=='kokuho'){br+='<div class="row"><span class="n">厚生年金保険料（本人）</span><span class="v">'+fmt(nenkin)+'円</span></div>';}
+    br+='<div class="row"><span class="n">雇用保険料（本人）</span><span class="v">'+fmt(emp)+'円</span></div>';
+    br+='<div class="row bold"><span class="n">合計（月額）</span><span class="v">'+fmt(total)+'円</span></div>';
+    br+='<div class="row" style="background:#f0fdf4"><span class="n">年間合計</span><span class="v" style="color:var(--green);font-size:14px">'+fmt(annual)+'円</span></div>';
+    setHTML('h_breakdown',br);
+
+    var basis='';
+    basis+='<div class="row"><span class="n">標準報酬月額</span><span class="v">'+fmt(hyo)+'円</span></div>';
+    if(insType!=='kokuho'){basis+='<div class="row"><span class="n">厚生年金 標準報酬月額（上限65万）</span><span class="v">'+fmt(nenkinHyo)+'円</span></div>';}
+    basis+='<div class="row"><span class="n">健康保険種別</span><span class="v" style="font-size:11px;min-width:auto">'+kenpoLabel+'</span></div>';
+    if(insType!=='kokuho'){basis+='<div class="row"><span class="n">厚生年金保険料率（折半）</span><span class="v">9.15%</span></div>';}
+    if(kaigo&&insType!=='kokuho'){basis+='<div class="row"><span class="n">介護保険料率（折半）</span><span class="v">0.865%</span></div>';}
+    basis+='<div class="row"><span class="n">雇用保険料率（本人）</span><span class="v">'+(empRate*100).toFixed(1)+'%</span></div>';
+    basis+='<div class="row" style="border-bottom:none"><span class="n">雇用保険計算基礎賃金</span><span class="v">'+fmt(wage)+'円</span></div>';
+    setHTML('h_basis',basis);
+
+    var notes=[];
+    notes.push('✅ 計算結果は概算です。実際の保険料は標準報酬月額の等級区分によって端数が異なります。');
+    if(hyo>=1390000)notes.push('ℹ️ 健康保険の標準報酬月額の上限（139万円）に達しています。');
+    if(nenkinHyo>=650000)notes.push('ℹ️ 厚生年金の標準報酬月額の上限（65万円）に達しています。');
+    if(insType==='kumiai')notes.push('📌 組合健保の料率は毎年変更されます。給与明細で実際の控除額を必ず確認してください。');
+    setHTML('h_notes',notes.join('<br>'));
+
+    // Store annual for reflect button
+    document.getElementById('ref-to-furusato-btn')._annual=annual;
+  }catch(e){console.error('hCalc error:',e);setHTML('h_notes','計算エラー: '+e.message);}
+}
+
+// ===== イベントバインド（DOMContentLoaded不要 - scriptはbody末尾）=====
+
+// 健保種別切替
+document.querySelectorAll('.ins-type-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.ins-type-btn').forEach(function(b){b.classList.remove('sel');});
+    this.classList.add('sel');
+    var t=this.getAttribute('data-ins');
+    document.getElementById('ins-kyokai-opts').style.display=(t==='kyokai')?'block':'none';
+    document.getElementById('ins-kumiai-opts').style.display=(t==='kumiai')?'block':'none';
+    document.getElementById('ins-kokuho-opts').style.display=(t==='kokuho')?'block':'none';
+    hCalc();
+  });
+});
+
+// 社会保険料タブ: 全inputに直接バインド（DOMContentLoaded廃止）
+document.querySelectorAll('#pane-h input,#pane-h select').forEach(function(el){
+  ['input','change'].forEach(function(ev){
+    el.addEventListener(ev,function(){
+      if(el.id==='h_monthly'){
+        var yen=parseFloat(el.value)||0;
+        if(yen>0){document.getElementById('h_hyo').value=getHyo(yen);}
+      }
+      hCalc();
+    });
+  });
+});
+
+// 「ふるさと納税タブに反映」ボタン
+document.getElementById('ref-to-furusato-btn').addEventListener('click',function(){
+  var annual=this._annual||0;
+  if(!annual)return;
+  document.getElementById('si').value=Math.round(annual/10000*10)/10;
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.pane').forEach(function(p){p.classList.remove('active');});
+  document.querySelector('.tab-btn[data-tab="f"]').classList.add('active');
+  document.getElementById('pane-f').classList.add('active');
+  calc();
+  var btn=document.getElementById('ref-to-furusato-btn');
+  btn.textContent='✅ 反映しました！ふるさと納税タブで確認してください';
+  btn.style.background='#16a34a';
+  setTimeout(function(){btn.textContent='🏠 この金額をふるさと納税タブに反映する';btn.style.background='';},3000);
+});
+
+// 初期計算（空欄なら「—」表示）
+hCalc();
+</script>
+</body>
+</html>
