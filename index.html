@@ -78,12 +78,21 @@ input:checked+.swsl{background:var(--blue);}input:checked+.swsl::before{transfor
 .ins-type-btn:hover{border-color:#aaa;}
 .h-detail{background:#fff;border-radius:10px;padding:13px 17px;box-shadow:var(--shadow);margin-bottom:10px;}
 .h-detail h3{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.lang-sw{display:flex;gap:6px;margin-top:8px;}
+.lang-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);color:#fff;font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;cursor:pointer;font-family:inherit;transition:all .15s;}
+.lang-btn.active{background:#fff;color:var(--darkblue);border-color:#fff;}
+.lang-btn:hover:not(.active){background:rgba(255,255,255,.22);}
 </style>
 </head>
 <body>
 <header>
   <h1>📊 給与・控除シミュレーター</h1>
-  <p>ふるさと納税上限計算 &amp; 社会保険料シミュレーション | 2025年度版</p>
+  <p>ふるさと納税上限計算 &amp; 社会保険料シミュレーション</p>
+  <div class="lang-sw" id="lang-sw">
+    <button data-lang="ja" class="lang-btn active">日本語</button>
+    <button data-lang="zh" class="lang-btn">中文</button>
+    <button data-lang="en" class="lang-btn">English</button>
+  </div>
 </header>
 <div class="tab-bar">
   <button class="tab-btn active" data-tab="f">🏠 ふるさと納税</button>
@@ -94,6 +103,63 @@ input:checked+.swsl{background:var(--blue);}input:checked+.swsl::before{transfor
 <div id="pane-f" class="pane active">
 <div class="wrap">
 <div><!-- LEFT -->
+
+<div class="card" style="border:2px solid var(--teal);background:#f0fdfb">
+  <div class="coll-h open" id="guide_h" style="font-size:14px;font-weight:700;color:var(--teal)">📖 使い方ガイド（はじめての方はここを見てください）</div>
+  <div class="coll-b open" id="guide_b" style="font-size:12.5px;line-height:1.9;color:var(--text)">
+
+    <p style="margin-bottom:8px"><strong>このツールでできること：</strong></p>
+    <p style="margin-bottom:10px">
+      🏠 <strong>ふるさと納税タブ</strong>：寄付してもお得になる上限額（自己負担2,000円で済む範囲）がわかります<br>
+      🏥 <strong>社会保険料タブ</strong>：毎月給料から引かれる健康保険・年金・雇用保険の金額がわかります
+    </p>
+
+    <div style="border-top:1px dashed var(--border);margin:10px 0"></div>
+
+    <p style="margin-bottom:8px"><strong>① 事前に用意するもの（あると正確になります）</strong></p>
+    <p style="margin-bottom:10px">
+      ・<strong>源泉徴収票</strong>（年末に会社からもらう紙。「支払金額」「社会保険料等の金額」が書いてある）<br>
+      ・なければ<strong>給与明細</strong>でもOK。1年分（または働いた分）を自分で合計してください
+    </p>
+
+    <div style="border-top:1px dashed var(--border);margin:10px 0"></div>
+
+    <p style="margin-bottom:8px"><strong>② ふるさと納税タブの使い方（3ステップ）</strong></p>
+    <p style="margin-bottom:10px">
+      <strong>Step 1.</strong> 「年収（給与収入）」に、税金や保険料を<u>引かれる前</u>の金額を入力<br>
+      　・源泉徴収票がある → 「支払金額」の数字をそのまま入力<br>
+      　・ない → 給与明細の「総支給額」（通勤費は除く）を1年分合計<br>
+      　・今年入社などでまだ1年働いていない → 実際に働いた分だけでOK（例：4月入社なら4〜12月の9ヶ月分）<br><br>
+      <strong>Step 2.</strong> 「社会保険料」は<u>空欄のままでOK</u>（自動でだいたいの金額を計算します）。源泉徴収票があれば「社会保険料等の金額」を入力するとより正確になります<br><br>
+      <strong>Step 3.</strong> 下の項目（配偶者・扶養家族・保険料控除など）は、自分に当てはまるものだけ入力。当てはまらないものは空欄・未入力のままで大丈夫です
+    </p>
+    <p style="margin-bottom:10px">
+      入力すると、右側に<strong>「ふるさと納税 上限額」</strong>が自動で表示されます。この金額までなら、寄付しても実質2,000円の負担で済みます。
+    </p>
+
+    <div style="border-top:1px dashed var(--border);margin:10px 0"></div>
+
+    <p style="margin-bottom:8px"><strong>③ 社会保険料タブの使い方（3ステップ）</strong></p>
+    <p style="margin-bottom:10px">
+      <strong>Step 1.</strong> 健康保険の種類を選ぶ（会社員は「協会けんぽ」か「組合健保」。給与明細の「健康保険」欄に組合名が書いてあれば「組合健保」）<br>
+      <strong>Step 2.</strong> 「月収」に、税金や保険料を引かれる前の1ヶ月分の給料を入力（通勤費は除く）<br>
+      <strong>Step 3.</strong> 「標準報酬月額」は自動で入ります。給与明細で確認できる場合は手入力でも修正できます
+    </p>
+    <p style="margin-bottom:10px">
+      計算結果の「年間合計」は、<strong>「この金額をふるさと納税タブに反映する」</strong>ボタンを押すと、そのままふるさと納税タブに使えます。
+    </p>
+
+    <div style="border-top:1px dashed var(--border);margin:10px 0"></div>
+
+    <p style="margin-bottom:6px"><strong>❓ よくある質問</strong></p>
+    <p style="margin-bottom:0">
+      <strong>Q. わからない項目がある</strong><br>
+      → 空欄・未入力・0のままでOKです。わかる項目だけ入力すれば、概算の結果が出ます。<br>
+      <strong>Q. この結果は完全に正確？</strong><br>
+      → あくまで概算です。最終的な判断は、源泉徴収票など実際の数字で確認してください。
+    </p>
+  </div>
+</div>
 
 <div class="card">
   <div class="card-title"><span class="nb">1</span>💼 年収・社会保険料<span class="acc-badge">最重要</span></div>
@@ -391,9 +457,9 @@ input:checked+.swsl{background:var(--blue);}input:checked+.swsl::before{transfor
   <div class="card-title"><span class="nb" style="background:var(--teal)">3</span>💼 雇用保険</div>
   <div class="f"><label>事業の種類</label>
     <select id="h_emp_type">
-      <option value="0.006">一般の事業（0.5%）</option>
-      <option value="0.007">農林水産・清酒製造の事業（0.6%）</option>
-      <option value="0.007b">建設の事業（0.6%）</option>
+      <option value="0.005">一般の事業（0.5%）</option>
+      <option value="0.006">農林水産・清酒製造の事業（0.6%）</option>
+      <option value="0.006b">建設の事業（0.6%）</option>
     </select>
   </div>
   <div class="f"><label>月収（交通費含む・雇用保険の計算基礎）</label>
@@ -438,7 +504,7 @@ input:checked+.swsl{background:var(--blue);}input:checked+.swsl::before{transfor
     <div class="row"><span class="n">厚生年金保険料率（折半）</span><span class="v">9.15%</span></div>
     <div class="row"><span class="n">介護保険料率（折半）</span><span class="v">0.865%</span></div>
     <div class="row"><span class="n">協会けんぽ（大阪・折半）</span><span class="v">5.145%</span></div>
-    <div class="row" style="border-bottom:none"><span class="n">雇用保険（一般事業・本人）</span><span class="v">0.6%</span></div>
+    <div class="row" style="border-bottom:none"><span class="n">雇用保険（一般事業・本人）</span><span class="v">0.5%</span></div>
   </div>
 
   <div class="nbox" id="h_notes" style="margin-top:8px">
@@ -451,6 +517,54 @@ input:checked+.swsl{background:var(--blue);}input:checked+.swsl::before{transfor
 </div><!-- END PANE-H -->
 
 <script>
+// ===== I18N =====
+var I18N = {"給与・控除シミュレーター": ["故乡纳税预测", "Salary and Deduction Simulator"], "📊 給与・控除シミュレーター": ["📊 故乡纳税预测", "📊 Salary and Deduction Simulator"], "ふるさと納税上限計算 & 社会保険料シミュレーション": ["故乡纳税上限计算 与 社会保险费模拟", "Furusato Nozei Limit Calculator and Social Insurance Simulator"], "🏠 ふるさと納税": ["🏠 故乡纳税", "🏠 Furusato Nozei"], "🏥 社会保険料": ["🏥 社会保险费", "🏥 Social Insurance"], "📖 使い方ガイド（はじめての方はここを見てください）": ["📖 使用指南（第一次使用请看这里）", "📖 User Guide (first-time users, read this)"], "💼 年収・社会保険料": ["💼 年收入・社会保险费", "💼 Annual Income and Social Insurance"], "最重要": ["最重要", "Most important"], "の「支払金額」と「社会保険料等の金額」を入力すると最高精度になります": ["的「支付金额」和「社会保险费等金额」，可获得最高精度", "field for「Payment amount」and「Social insurance premium amount」for maximum accuracy"], "年収（給与収入）": ["年收入（工资收入）", "Annual income (salary income)"], "支払金額": ["支付金额", "Payment amount"], "万円": ["万日元", "x10,000 JPY"], "社会保険料": ["社会保险费", "Social insurance premium"], "源泉票に記載": ["扣缴凭证上有记载", "Shown on withholding statement"], "源泉徴収票から入力 or 社保タブで計算": ["可从扣缴凭证输入，或在社保标签中计算", "Enter from your withholding statement, or calculate it in the Social Insurance tab"], "40歳以上（介護保険料あり）": ["40岁以上（含护理保险费）", "Age 40 or over (includes long-term care insurance)"], "40歳以上は介護保険料が社会保険に加算されます（自動計算の場合）": ["40岁以上会在社会保险中加算护理保险费（自动计算时）", "For age 40 and over, long-term care insurance premium is added to social insurance (when auto-calculated)"], "🛡️ 生命・損害保険料控除": ["🛡️ 人寿・损害保险费扣除", "🛡️ Life and Casualty Insurance Deduction"], "生命保険料（新制度 2012年以降契約）": ["人寿保险费（新制度，2012年以后签约）", "Life insurance premium (New system, contracted 2012 onward)"], "3区分それぞれ独立。所得税上限各4万 / 住民税上限各2.8万": ["3个类别各自独立。所得税各上限4万日元 ／ 居民税各上限2.8万日元", "3 categories, each independent. Income tax limit 40k each / Resident tax limit 28k each"], "一般生命": ["一般人寿", "General life"], "円": ["日元", "JPY"], "介護医療": ["护理医疗", "Nursing care and medical"], "個人年金": ["个人年金", "Individual annuity"], "生命保険料（旧制度 2011年以前契約）": ["人寿保险费（旧制度，2011年以前签约）", "Life insurance premium (Old system, contracted before 2011)"], "2区分それぞれ独立。所得税上限各5万 / 住民税上限各3.5万": ["2个类别各自独立。所得税各上限5万日元 ／ 居民税各上限3.5万日元", "2 categories, each independent. Income tax limit 50k each / Resident tax limit 35k each"], "一般生命（旧）": ["一般人寿（旧）", "General life (old)"], "個人年金（旧）": ["个人年金（旧）", "Individual annuity (old)"], "地震保険料（年間）": ["地震保险费（年）", "Earthquake insurance (annual)"], "所得税1/2上限5万 / 住民税1/4上限2.5万": ["所得税1/2・上限5万日元 ／ 居民税1/4・上限2.5万日元", "Income tax 1/2, limit 50k / Resident tax 1/4, limit 25k"], "旧長期損害保険料": ["旧长期损害保险费", "Old long-term casualty insurance"], "2007年以前契約・10年以上・満期返戻あり": ["2007年以前签约・10年以上・满期有返还", "Contracted before 2007, 10+ years, with maturity refund"], "👫 配偶者": ["👫 配偶", "👫 Spouse"], "配偶者区分": ["配偶类别", "Spouse category"], "配偶者なし": ["无配偶", "No spouse"], "配偶者控除（配偶者所得48万以下）": ["配偶者扣除（配偶所得48万日元以下）", "Spouse deduction (spouse income 480k or less)"], "配偶者特別控除（配偶者所得48〜133万）": ["配偶者特别扣除（配偶所得48万〜133万日元）", "Special spouse deduction (spouse income 480k-1,330k)"], "配偶者の合計所得": ["配偶的总所得", "Spouse total income"], "給与収入→所得目安: 年収100万≒所得45万, 150万≒95万": ["工资收入→所得参考：年收入100万≒所得45万，150万≒95万", "Salary income to income estimate: annual 1M ≈ income 450k, 1.5M ≈ 950k"], "👪 国内扶養親族": ["👪 国内被扶养亲属", "👪 Domestic Dependents"], "＋ 国内扶養を追加": ["＋ 添加国内被扶养人", "+ Add domestic dependent"], "✈️ 海外扶養親族（非居住者）": ["✈️ 海外被扶养亲属（非居民）", "✈️ Overseas Dependents (Non-resident)"], "2023年改正：": ["2023年修订：", "2023 Revision:"], "30〜69歳は「留学生」「障害者」「年間38万円以上の送金」のいずれかに該当しないと控除不可。確定申告に親族関係書類・送金記録の添付が必要。": ["30〜69岁必须符合「留学生」「残障人士」「年送金38万日元以上」之一才能扣除。确定申报时需附上亲属关系证明和送金记录。", "Ages 30-69 must meet one of: international student, person with a disability, or annual remittance of 380k+ to qualify. Family relationship documents and remittance records must be attached to your tax return."], "＋ 海外扶養を追加": ["＋ 添加海外被扶养人", "+ Add overseas dependent"], "📋 その他の控除": ["📋 其他扣除", "📋 Other Deductions"], "iDeCo 年間掛金": ["iDeCo 年缴金额", "iDeCo annual contribution"], "全額所得控除。会社員（企業DC無）上限年27.6万円": ["全额所得扣除。公司员工（无企业年金）年上限27.6万日元", "Fully tax-deductible. For employees without a company DC plan, annual limit is 276k"], "医療費控除（年間医療費合計）": ["医疗费扣除（年度医疗费总额）", "Medical expense deduction (total annual medical expenses)"], "10万円超（または総所得×5%超）の部分が控除対象、上限200万": ["超过10万日元（或总所得×5%）的部分可扣除，上限200万日元", "The portion exceeding 100k (or 5% of total income) is deductible, up to 2M"], "セルフメディケーション税制（医療費控除と選択）": ["自我药疗税制（与医疗费扣除二选一）", "Self-medication tax system (alternative to medical expense deduction)"], "特定OTC購入額（12,001円〜88,000円が控除対象）": ["指定OTC药品购买额（12,001〜88,000日元为扣除对象）", "Specified OTC drug purchase amount (12,001-88,000 JPY is deductible)"], "障害者控除": ["残障人士扣除", "Disability deduction"], "障害区分": ["残障类别", "Disability category"], "普通障害者（27万/26万）": ["普通残障人士（27万/26万日元）", "General disability (270k/260k)"], "特別障害者（40万/30万）": ["特别残障人士（40万/30万日元）", "Special disability (400k/300k)"], "同居特別障害者（75万/53万）": ["同居特别残障人士（75万/53万日元）", "Special disability living together (750k/530k)"], "ひとり親控除（35万/30万）": ["单亲扣除（35万/30万日元）", "Single-parent deduction (350k/300k)"], "寡婦控除（27万/26万）": ["寡妇扣除（27万/26万日元）", "Widow deduction (270k/260k)"], "勤労学生控除（27万/26万）": ["勤劳学生扣除（27万/26万日元）", "Working student deduction (270k/260k)"], "🎁 住宅ローン・寄付状況": ["🎁 住房贷款・捐款情况", "🎁 Home Loan and Donation Status"], "住宅ローン控除（住民税分）": ["住房贷款扣除（居民税部分）", "Home loan deduction (resident tax portion)"], "住民税上限9.75万円（特例は13.65万円）": ["居民税上限9.75万日元（特例为13.65万日元）", "Resident tax limit 97.5k (special case 136.5k)"], "今年の寄付予定額": ["今年预计捐款额", "Planned donation this year"], "寄付先自治体数（ワンストップ特例は5以内）": ["捐款目的地自治体数（一站式特例限5个以内）", "Number of municipalities donated to (One-stop exception applies up to 5)"], "自治体": ["个自治体", "municipalities"], "ふるさと納税 上限額（目安）": ["故乡纳税上限额（参考）", "Furusato Nozei Limit (estimate)"], "円（2,000円自己負担を除く実質無料枠）": ["日元（除2,000日元自付外的实质免费额度）", "JPY (effectively free amount excluding the 2,000 yen self-payment)"], "実質自己負担": ["实际自付金额", "Actual out-of-pocket cost"], "📊 寄付進捗": ["📊 捐款进度", "📊 Donation Progress"], "寄付予定額を入力すると表示されます": ["输入预计捐款额后会显示", "Shown once you enter your planned donation amount"], "📐 課税所得・税率": ["📐 应税所得・税率", "📐 Taxable Income and Tax Rate"], "📋 所得控除一覧（所得税）": ["📋 所得扣除一览（所得税）", "📋 Income Deductions (Income Tax)"], "📋 所得控除一覧（住民税）": ["📋 所得扣除一览（居民税）", "📋 Income Deductions (Resident Tax)"], "💰 節税効果（ふるさと納税上限寄付時）": ["💰 节税效果（按故乡纳税上限捐款时）", "💰 Tax Savings (When donating up to the limit)"], "🏥 健康保険の種類": ["🏥 健康保险种类", "🏥 Health Insurance Type"], "協会けんぽ": ["协会健保（全国健康保险协会）", "Kyokai Kenpo (Japan Health Insurance Assoc.)"], "全国健康保険協会": ["全国健康保险协会", "Japan Health Insurance Association"], "組合健保": ["组合健保", "Union Health Insurance (Kumiai Kenpo)"], "会社の健保組合": ["公司的健保组合", "Companys health insurance union"], "国民健康保険": ["国民健康保险", "National Health Insurance (Kokuho)"], "自営業・無職": ["自营业者・无业", "Self-employed / Unemployed"], "都道府県（事業所所在地）": ["都道府县（事业所所在地）", "Prefecture (business location)"], "2025年度 協会けんぽ保険料率（労使折半後の本人負担率）": ["2025年度 协会健保保险费率（劳资对半后本人负担率）", "FY2025 Kyokai Kenpo premium rate (employee share after 50/50 split)"], "健康保険料率（本人負担分 %）": ["健康保险费率（本人负担部分 %）", "Health insurance rate (employee share %)"], "給与明細を確認": ["请查看工资单", "Check your pay stub"], "給与明細の「健康保険料」÷ 標準報酬月額 で確認できます": ["可用工资单上的「健康保险费」÷标准报酬月额来确认", "You can check this by dividing Health insurance premium on your pay stub by your standard monthly remuneration"], "国民健康保険は自治体ごとに計算が複雑なため、月額を直接入力してください。": ["国民健康保险因各自治体计算方式复杂，请直接输入月额。", "National Health Insurance calculations are complex and vary by municipality, so please enter the monthly amount directly."], "国民健康保険料（月額・本人分）": ["国民健康保险费（月额・本人部分）", "National Health Insurance premium (monthly, employee portion)"], "👤 年齢・月収": ["👤 年龄・月收入", "👤 Age and Monthly Income"], "40歳以上65歳未満の方は介護保険料（2025年度: 全国一律1.73%）が加算されます": ["40岁以上未满65岁的人会加算护理保险费（2025年度：全国统一1.73%）", "For those aged 40-64, long-term care insurance premium is added (FY2025: uniform nationwide rate 1.73%)"], "月収（税引前・交通費除く）": ["月收入（税前・不含交通费）", "Monthly income (before tax, excluding commuting allowance)"], "入力後すぐに自動換算。動かない場合は": ["输入后会立即自动换算。若未生效，请点击", "Converts automatically right after you type. If it does not update, click the"], "→ 計算する": ["→ 计算", "Calculate"], "を押してください": ["按钮", "button"], "標準報酬月額（自動換算）": ["标准报酬月额（自动换算）", "Standard monthly remuneration (auto-converted)"], "直接編集も可能。月収から自動計算された値が入ります": ["也可以直接编辑。会自动填入根据月收入计算出的数值", "Can be edited directly. A value auto-calculated from monthly income is filled in"], "💼 雇用保険": ["💼 雇佣保险", "💼 Employment Insurance"], "事業の種類": ["事业种类", "Business type"], "一般の事業（0.5%）": ["一般事业（0.5%）", "General business (0.5%)"], "農林水産・清酒製造の事業（0.6%）": ["农林水产・清酒制造业（0.6%）", "Agriculture / forestry / fisheries and sake brewing (0.6%)"], "建設の事業（0.6%）": ["建筑业（0.6%）", "Construction business (0.6%)"], "月収（交通費含む・雇用保険の計算基礎）": ["月收入（含交通费・雇佣保险计算基础）", "Monthly income (including commuting allowance; basis for employment insurance)"], "雇用保険は標準報酬ではなく実際の賃金に料率をかけます": ["雇佣保险不是按标准报酬，而是按实际工资乘以费率计算", "Employment insurance is calculated by multiplying the actual wage (not standard remuneration) by the rate"], "月額 社会保険料 合計（本人負担）": ["月额 社会保险费 合计（本人负担）", "Monthly Social Insurance Total (Employee Share)"], "円 / 月": ["日元 / 月", "JPY / month"], "年間合計": ["年度合计", "Annual Total"], "📋 内訳（月額）": ["📋 明细（月额）", "📋 Breakdown (Monthly)"], "📐 計算の根拠": ["📐 计算依据", "📐 Calculation Basis"], "🏠 この金額をふるさと納税タブに反映する": ["🏠 将此金额反映到故乡纳税标签", "🏠 Apply this amount to the Furusato Nozei tab"], "ふるさと納税タブの「社会保険料」欄に年間合計を自動入力します": ["会自动将年度合计填入故乡纳税标签的「社会保险费」栏", "This will automatically fill in the annual total in the Social insurance premium field on the Furusato Nozei tab"], "ℹ️ 2025年度 保険料率": ["ℹ️ 2025年度 保险费率", "ℹ️ FY2025 Premium Rates"], "厚生年金保険料率（折半）": ["厚生年金保险费率（对半）", "Employee pension rate (50/50 split)"], "介護保険料率（折半）": ["护理保险费率（对半）", "Long-term care insurance rate (50/50 split)"], "協会けんぽ（大阪・折半）": ["协会健保（大阪・对半）", "Kyokai Kenpo (Osaka, 50/50 split)"], "雇用保険（一般事業・本人）": ["雇佣保险（一般事业・本人）", "Employment insurance (general business, employee)"], "月収を入力すると社会保険料を自動計算します。": ["输入月收入后会自动计算社会保险费。", "Enter your monthly income to automatically calculate social insurance premiums."], "結果は概算です。正確な金額は給与明細または所属の人事部門でご確認ください。": ["结果为概算。准确金额请通过工资单或所属人事部门确认。", "This is an estimate. Please check your pay stub or HR department for the exact amount."], "空欄=自動計算": ["留空=自动计算", "Blank = auto-calculate"], "年収を入力すると表示されます": ["输入年收入后会显示", "Shown once you enter your annual income"], "💡 年収（給与収入）を入力してください。": ["💡 请输入年收入（工资收入）。", "💡 Please enter your annual income (salary income)."], "社会保険料 自動推計: 約": ["社会保险费 自动推算：约", "Social insurance (auto-estimated): approx."], "万円（健保+厚年+雇保）": ["万日元（健保+厚年+雇保）", "x10,000 JPY (health + pension + employment ins.)"], "給与収入": ["工资收入", "Salary income"], "▲給与所得控除": ["▲工资所得扣除", "Employment income deduction"], "給与所得": ["工资所得", "Employment income"], "▲社会保険料控除": ["▲社会保险费扣除", "Social insurance deduction"], "所得税 課税所得": ["所得税 应税所得", "Income tax taxable income"], "限界税率（ふるさと納税計算用）": ["边际税率（故乡纳税计算用）", "Marginal tax rate (for Furusato Nozei calc)"], "住民税 課税所得": ["居民税 应税所得", "Resident tax taxable income"], "住民税所得割（10%）": ["居民税所得比例部分（10%）", "Resident tax income levy (10%)"], "▲調整控除": ["▲调整扣除", "Adjustment deduction"], "▲住宅ローン控除（住民税）": ["▲住房贷款扣除（居民税）", "Home loan deduction (resident tax)"], "住民税所得割（計算用）": ["居民税所得比例部分（计算用）", "Resident tax income levy (for calculation)"], "基礎控除": ["基础扣除", "Basic deduction"], "社会保険料控除": ["社会保险费扣除", "Social insurance deduction"], "生命保険料控除": ["人寿保险费扣除", "Life insurance deduction"], "地震保険料控除": ["地震保险费扣除", "Earthquake insurance deduction"], "配偶者控除/特別控除": ["配偶者扣除/特别扣除", "Spouse deduction / special deduction"], "国内扶養控除": ["国内被扶养扣除", "Domestic dependent deduction"], "海外扶養控除": ["海外被扶养扣除", "Overseas dependent deduction"], "iDeCo掛金控除": ["iDeCo缴费扣除", "iDeCo contribution deduction"], "医療費控除": ["医疗费扣除", "Medical expense deduction"], "ひとり親控除": ["单亲扣除", "Single-parent deduction"], "寡婦控除": ["寡妇扣除", "Widow deduction"], "勤労学生控除": ["勤劳学生扣除", "Working student deduction"], "合計控除額": ["扣除合计额", "Total deductions"], "所得税還付（復興特別所得税込）": ["所得税返还（含复兴特别所得税）", "Income tax refund (incl. special reconstruction tax)"], "住民税控除（基本分10%）": ["居民税扣除（基本部分10%）", "Resident tax reduction (basic 10%)"], "住民税控除（特例分）": ["居民税扣除（特例部分）", "Resident tax reduction (special portion)"], "控除合計": ["扣除合计", "Total reduction"], "自己負担（実質コスト）": ["自付金额（实际成本）", "Out-of-pocket cost (actual cost)"], "📌 社会保険料は自動概算です。「社会保険料タブ」で正確な計算後に反映するか、源泉徴収票の値を直接入力してください。": ["📌 社会保险费为自动概算。请在「社会保险费」标签中计算准确金额后反映，或直接输入扣缴凭证上的数值。", "📌 The social insurance premium is an automatic estimate. Please calculate the exact amount on the Social Insurance tab and apply it, or enter the value from your withholding statement directly."], "自治体 → ワンストップ特例不可。確定申告が必要です。": ["个自治体 → 无法使用一站式特例，需要办理确定申报。", "municipalities: One-stop exception not available. A tax return is required."], "自治体以内 → ワンストップ特例利用可（確定申告不要）。": ["个以内自治体 → 可使用一站式特例（无需确定申报）。", "municipalities or fewer: One-stop exception available (no tax return needed)."], "✈️ 海外扶養を計上。確定申告に親族関係書類・送金記録の添付が必要です。": ["✈️ 已计入海外被扶养人。确定申报时需附上亲属关系证明和送金记录。", "✈️ Overseas dependents included. Family relationship documents and remittance records must be attached to your tax return."], "🏠 住宅ローン控除（住民税分）が上限計算に影響しています。": ["🏠 住房贷款扣除（居民税部分）正在影响上限计算。", "🏠 The home loan deduction (resident tax portion) is affecting the limit calculation."], "💡 iDeCoは全額所得控除。課税所得が下がり、ふるさと納税上限にも影響します。": ["💡 iDeCo为全额所得扣除。应税所得会降低，也会影响故乡纳税上限。", "💡 iDeCo is fully tax-deductible. It lowers taxable income and also affects the Furusato Nozei limit."], "📊 この計算は概算です。最終確認は源泉徴収票の実数値で行ってください。": ["📊 此计算为概算。最终请以扣缴凭证的实际数值确认。", "📊 This calculation is an estimate. Please make your final confirmation using the actual figures on your withholding statement."], "予定": ["预定", "Planned"], "上限": ["上限", "Limit"], "あと": ["还差", "remaining:"], "超過": ["超过", "over"], "💡 月収（税引前）を入力してください。標準報酬月額が自動換算されます。": ["💡 请输入月收入（税前）。标准报酬月额会自动换算。", "💡 Please enter your monthly income (before tax). The standard monthly remuneration will be auto-converted."], "協会けんぽ（": ["协会健保（", "Kyokai Kenpo ("], "% / 本人": ["% / 本人负担", "% / employee"], "%）": ["%）", "%)"], "組合健保（本人負担 ": ["组合健保（本人负担 ", "Union Kenpo (employee share "], "国民健康保険（手動入力）": ["国民健康保险（手动输入）", "National Health Insurance (manual input)"], "健康保険料（本人）": ["健康保险费（本人）", "Health insurance (employee)"], "介護保険料（本人）": ["护理保险费（本人）", "Long-term care insurance (employee)"], "厚生年金保険料（本人）": ["厚生年金保险费（本人）", "Employee pension (employee)"], "雇用保険料（本人）": ["雇佣保险费（本人）", "Employment insurance (employee)"], "合計（月額）": ["合计（月额）", "Total (monthly)"], "標準報酬月額": ["标准报酬月额", "Standard monthly remuneration"], "厚生年金 標準報酬月額（上限65万）": ["厚生年金 标准报酬月额（上限65万日元）", "Employee pension standard remuneration (cap 650k)"], "健康保険種別": ["健康保险种类", "Health insurance type"], "雇用保険料率（本人）": ["雇佣保险费率（本人）", "Employment insurance rate (employee)"], "雇用保険計算基礎賃金": ["雇佣保险计算基础工资", "Wage basis for employment insurance calculation"], "✅ 計算結果は概算です。実際の保険料は標準報酬月額の等級区分によって端数が異なります。": ["✅ 计算结果为概算。实际保险费会因标准报酬月额的等级区分而有零头差异。", "✅ This result is an estimate. Actual premiums may differ slightly due to standard remuneration grade brackets."], "ℹ️ 健康保険の標準報酬月額の上限（139万円）に達しています。": ["ℹ️ 已达到健康保险标准报酬月额的上限（139万日元）。", "ℹ️ The health insurance standard remuneration cap (1.39M) has been reached."], "ℹ️ 厚生年金の標準報酬月額の上限（65万円）に達しています。": ["ℹ️ 已达到厚生年金标准报酬月额的上限（65万日元）。", "ℹ️ The employee pension standard remuneration cap (650k) has been reached."], "📌 組合健保の料率は毎年変更されます。給与明細で実際の控除額を必ず確認してください。": ["📌 组合健保的费率每年都会变动。请务必通过工资单确认实际扣除金额。", "📌 Union Kenpo rates change every year. Please be sure to check the actual deduction amount on your pay stub."], "✅ 反映しました！ふるさと納税タブで確認してください": ["✅ 已反映！请在故乡纳税标签中确认", "✅ Applied! Please check the Furusato Nozei tab"], "区分": ["类别", "Category"], "一般扶養（16〜18歳/23〜69歳）": ["一般被扶养（16〜18岁/23〜69岁）", "General dependent (16-18 / 23-69)"], "特定扶養（19〜22歳）": ["特定被扶养（19〜22岁）", "Specific dependent (19-22)"], "老人扶養（70歳以上）": ["老人被扶养（70岁以上）", "Elderly dependent (70+)"], "同居老人扶養（70歳以上）": ["同居老人被扶养（70岁以上）", "Cohabiting elderly dependent (70+)"], "人数": ["人数", "Number of people"], "1人": ["1人", "1 person"], "2人": ["2人", "2 people"], "3人": ["3人", "3 people"], "年齢区分": ["年龄类别", "Age category"], "16歳未満（控除対象外）": ["16岁以下（非扣除对象）", "Under 16 (not eligible)"], "16〜29歳/70歳以上": ["16〜29岁/70岁以上", "16-29 / 70+"], "30〜69歳（条件付き）": ["30〜69岁（附条件）", "30-69 (conditional)"], "70歳以上": ["70岁以上", "70+"], "30-69歳の条件": ["30-69岁的条件", "Condition for age 30-69"], "該当なし": ["不符合", "None apply"], "留学・障害・38万送金": ["留学生・残障・38万送金", "Student / Disability / 380k+ remittance"], "東京都（9.98%）": ["东京都（9.98%）", "Tokyo (9.98%)"], "北海道（10.21%）": ["北海道（10.21%）", "Hokkaido (10.21%)"], "青森県（9.81%）": ["青森县（9.81%）", "Aomori (9.81%)"], "岩手県（9.75%）": ["岩手县（9.75%）", "Iwate (9.75%)"], "宮城県（10.02%）": ["宫城县（10.02%）", "Miyagi (10.02%)"], "秋田県（10.02%）": ["秋田县（10.02%）", "Akita (10.02%)"], "山形県（9.92%）": ["山形县（9.92%）", "Yamagata (9.92%)"], "福島県（9.65%）": ["福岛县（9.65%）", "Fukushima (9.65%)"], "茨城県（9.72%）": ["茨城县（9.72%）", "Ibaraki (9.72%)"], "栃木県（9.82%）": ["栃木县（9.82%）", "Tochigi (9.82%)"], "群馬県（9.65%）": ["群马县（9.65%）", "Gunma (9.65%)"], "埼玉県（9.70%）": ["埼玉县（9.70%）", "Saitama (9.70%)"], "千葉県（9.68%）": ["千叶县（9.68%）", "Chiba (9.68%)"], "神奈川県（10.02%）": ["神奈川县（10.02%）", "Kanagawa (10.02%)"], "新潟県（9.51%）": ["新潟县（9.51%）", "Niigata (9.51%)"], "富山県（9.57%）": ["富山县（9.57%）", "Toyama (9.57%)"], "石川県（9.96%）": ["石川县（9.96%）", "Ishikawa (9.96%)"], "福井県（9.91%）": ["福井县（9.91%）", "Fukui (9.91%)"], "山梨県（10.04%）": ["山梨县（10.04%）", "Yamanashi (10.04%)"], "長野県（9.63%）": ["长野县（9.63%）", "Nagano (9.63%)"], "岐阜県（9.91%）": ["岐阜县（9.91%）", "Gifu (9.91%)"], "静岡県（9.68%）": ["静冈县（9.68%）", "Shizuoka (9.68%)"], "愛知県（10.01%）": ["爱知县（10.01%）", "Aichi (10.01%)"], "三重県（9.81%）": ["三重县（9.81%）", "Mie (9.81%)"], "滋賀県（9.90%）": ["滋贺县（9.90%）", "Shiga (9.90%)"], "京都府（10.19%）": ["京都府（10.19%）", "Kyoto (10.19%)"], "大阪府（10.29%）": ["大阪府（10.29%）", "Osaka (10.29%)"], "兵庫県（10.22%）": ["兵库县（10.22%）", "Hyogo (10.22%)"], "奈良県（10.00%）": ["奈良县（10.00%）", "Nara (10.00%)"], "和歌山県（9.95%）": ["和歌山县（9.95%）", "Wakayama (9.95%)"], "鳥取県（9.93%）": ["鸟取县（9.93%）", "Tottori (9.93%)"], "島根県（9.93%）": ["岛根县（9.93%）", "Shimane (9.93%)"], "岡山県（10.10%）": ["冈山县（10.10%）", "Okayama (10.10%)"], "広島県（9.97%）": ["广岛县（9.97%）", "Hiroshima (9.97%)"], "山口県（10.06%）": ["山口县（10.06%）", "Yamaguchi (10.06%)"], "徳島県（10.23%）": ["德岛县（10.23%）", "Tokushima (10.23%)"], "香川県（10.37%）": ["香川县（10.37%）", "Kagawa (10.37%)"], "愛媛県（10.20%）": ["爱媛县（10.20%）", "Ehime (10.20%)"], "高知県（10.07%）": ["高知县（10.07%）", "Kochi (10.07%)"], "福岡県（10.28%）": ["福冈县（10.28%）", "Fukuoka (10.28%)"], "佐賀県（10.77%）": ["佐贺县（10.77%）", "Saga (10.77%)"], "長崎県（10.11%）": ["长崎县（10.11%）", "Nagasaki (10.11%)"], "熊本県（10.44%）": ["熊本县（10.44%）", "Kumamoto (10.44%)"], "大分県（10.26%）": ["大分县（10.26%）", "Oita (10.26%)"], "宮崎県（9.95%）": ["宫崎县（9.95%）", "Miyazaki (9.95%)"], "鹿児島県（10.25%）": ["鹿儿岛县（10.25%）", "Kagoshima (10.25%)"], "沖縄県（9.68%）": ["冲绳县（9.68%）", "Okinawa (9.68%)"]};
+var GUIDE_HTML = {"ja": "\n\n    <p style=\"margin-bottom:8px\"><strong>このツールでできること：</strong></p>\n    <p style=\"margin-bottom:10px\">\n      🏠 <strong>ふるさと納税タブ</strong>：寄付してもお得になる上限額（自己負担2,000円で済む範囲）がわかります<br>\n      🏥 <strong>社会保険料タブ</strong>：毎月給料から引かれる健康保険・年金・雇用保険の金額がわかります\n    </p>\n\n    <div style=\"border-top:1px dashed var(--border);margin:10px 0\"></div>\n\n    <p style=\"margin-bottom:8px\"><strong>① 事前に用意するもの（あると正確になります）</strong></p>\n    <p style=\"margin-bottom:10px\">\n      ・<strong>源泉徴収票</strong>（年末に会社からもらう紙。「支払金額」「社会保険料等の金額」が書いてある）<br>\n      ・なければ<strong>給与明細</strong>でもOK。1年分（または働いた分）を自分で合計してください\n    </p>\n\n    <div style=\"border-top:1px dashed var(--border);margin:10px 0\"></div>\n\n    <p style=\"margin-bottom:8px\"><strong>② ふるさと納税タブの使い方（3ステップ）</strong></p>\n    <p style=\"margin-bottom:10px\">\n      <strong>Step 1.</strong> 「年収（給与収入）」に、税金や保険料を<u>引かれる前</u>の金額を入力<br>\n      　・源泉徴収票がある → 「支払金額」の数字をそのまま入力<br>\n      　・ない → 給与明細の「総支給額」（通勤費は除く）を1年分合計<br>\n      　・今年入社などでまだ1年働いていない → 実際に働いた分だけでOK（例：4月入社なら4〜12月の9ヶ月分）<br><br>\n      <strong>Step 2.</strong> 「社会保険料」は<u>空欄のままでOK</u>（自動でだいたいの金額を計算します）。源泉徴収票があれば「社会保険料等の金額」を入力するとより正確になります<br><br>\n      <strong>Step 3.</strong> 下の項目（配偶者・扶養家族・保険料控除など）は、自分に当てはまるものだけ入力。当てはまらないものは空欄・未入力のままで大丈夫です\n    </p>\n    <p style=\"margin-bottom:10px\">\n      入力すると、右側に<strong>「ふるさと納税 上限額」</strong>が自動で表示されます。この金額までなら、寄付しても実質2,000円の負担で済みます。\n    </p>\n\n    <div style=\"border-top:1px dashed var(--border);margin:10px 0\"></div>\n\n    <p style=\"margin-bottom:8px\"><strong>③ 社会保険料タブの使い方（3ステップ）</strong></p>\n    <p style=\"margin-bottom:10px\">\n      <strong>Step 1.</strong> 健康保険の種類を選ぶ（会社員は「協会けんぽ」か「組合健保」。給与明細の「健康保険」欄に組合名が書いてあれば「組合健保」）<br>\n      <strong>Step 2.</strong> 「月収」に、税金や保険料を引かれる前の1ヶ月分の給料を入力（通勤費は除く）<br>\n      <strong>Step 3.</strong> 「標準報酬月額」は自動で入ります。給与明細で確認できる場合は手入力でも修正できます\n    </p>\n    <p style=\"margin-bottom:10px\">\n      計算結果の「年間合計」は、<strong>「この金額をふるさと納税タブに反映する」</strong>ボタンを押すと、そのままふるさと納税タブに使えます。\n    </p>\n\n    <div style=\"border-top:1px dashed var(--border);margin:10px 0\"></div>\n\n    <p style=\"margin-bottom:6px\"><strong>❓ よくある質問</strong></p>\n    <p style=\"margin-bottom:0\">\n      <strong>Q. わからない項目がある</strong><br>\n      → 空欄・未入力・0のままでOKです。わかる項目だけ入力すれば、概算の結果が出ます。<br>\n      <strong>Q. この結果は完全に正確？</strong><br>\n      → あくまで概算です。最終的な判断は、源泉徴収票など実際の数字で確認してください。\n    </p>", "zh": "\n    <p style=\"margin-bottom:8px\"><strong>这个工具能做什么：</strong></p>\n    <p style=\"margin-bottom:10px\">\n      🏠 <strong>故乡纳税标签</strong>：可以了解捐款也划算的上限金额（自付2,000日元即可的范围）<br>\n      🏥 <strong>社会保险费标签</strong>：可以了解每月从工资中扣除的健康保险・养老金・雇佣保险金额\n    </p>\n\n    <div style=\"border-top:1px dashed var(--border);margin:10px 0\"></div>\n\n    <p style=\"margin-bottom:8px\"><strong>① 事前准备的资料（有的话会更准确）</strong></p>\n    <p style=\"margin-bottom:10px\">\n      ・<strong>扣缴凭证（源泉徴収票）</strong>（年底公司发的那张纸，上面写有支付金额和社会保险费等金额）<br>\n      ・没有的话，用<strong>工资单</strong>也可以。请自己把一年（或已工作月份）的金额合计起来\n    </p>\n\n    <div style=\"border-top:1px dashed var(--border);margin:10px 0\"></div>\n\n    <p style=\"margin-bottom:8px\"><strong>② 故乡纳税标签使用方法（3个步骤）</strong></p>\n    <p style=\"margin-bottom:10px\">\n      <strong>第1步。</strong> 在「年收入（工资收入）」中，输入<u>扣除税金和保险费之前</u>的金额<br>\n      　・有扣缴凭证 → 直接输入「支付金额」的数字<br>\n      　・没有 → 把工资单的「总支付额」（不含交通费）合计一年的金额<br>\n      　・今年入职等还未工作满一年 → 只需合计实际工作月份即可（例：4月入职则合计4〜12月共9个月）<br><br>\n      <strong>第2步。</strong> 「社会保险费」<u>留空也没问题</u>（会自动计算大致金额）。如果有扣缴凭证，输入其中的社会保险费等金额会更准确<br><br>\n      <strong>第3步。</strong> 下面的项目（配偶・被扶养亲属・保险费扣除等）只需填写与自己相关的部分。不适用的项目留空・不填也没关系\n    </p>\n    <p style=\"margin-bottom:10px\">\n      输入后，右侧会自动显示<strong>「故乡纳税上限额」</strong>。只要在这个金额以内捐款，实际自付金额就只有2,000日元。\n    </p>\n\n    <div style=\"border-top:1px dashed var(--border);margin:10px 0\"></div>\n\n    <p style=\"margin-bottom:8px\"><strong>③ 社会保险费标签使用方法（3个步骤）</strong></p>\n    <p style=\"margin-bottom:10px\">\n      <strong>第1步。</strong> 选择健康保险的种类（公司员工一般是「协会健保」或「组合健保」。如果工资单的「健康保险」栏写有组合名称，则选「组合健保」）<br>\n      <strong>第2步。</strong> 在「月收入」中输入扣除税金和保险费之前的一个月工资（不含交通费）<br>\n      <strong>第3步。</strong> 「标准报酬月额」会自动填入。如果能在工资单上确认，也可以手动修正\n    </p>\n    <p style=\"margin-bottom:10px\">\n      计算结果中的「年度合计」，点击<strong>「将此金额反映到故乡纳税标签」</strong>按钮后，就可以直接在故乡纳税标签中使用。\n    </p>\n\n    <div style=\"border-top:1px dashed var(--border);margin:10px 0\"></div>\n\n    <p style=\"margin-bottom:6px\"><strong>❓ 常见问题</strong></p>\n    <p style=\"margin-bottom:0\">\n      <strong>问：有不清楚的项目怎么办？</strong><br>\n      → 留空・不填・填0都没问题。只填写清楚的项目，也能得到大致的结果。<br>\n      <strong>问：这个结果完全准确吗？</strong><br>\n      → 这只是概算。最终判断请以扣缴凭证等实际数字为准进行确认。\n    </p>\n", "en": "\n    <p style=\"margin-bottom:8px\"><strong>What this tool can do:</strong></p>\n    <p style=\"margin-bottom:10px\">\n      🏠 <strong>Furusato Nozei tab</strong>: Find out the donation limit where you still come out ahead (the range where your out-of-pocket cost stays at 2,000 yen)<br>\n      🏥 <strong>Social Insurance tab</strong>: Find out how much health insurance, pension, and employment insurance are deducted from your monthly salary each month\n    </p>\n\n    <div style=\"border-top:1px dashed var(--border);margin:10px 0\"></div>\n\n    <p style=\"margin-bottom:8px\"><strong>Step 0. What to prepare beforehand (having these makes it more accurate)</strong></p>\n    <p style=\"margin-bottom:10px\">\n      &middot; Your <strong>withholding tax statement (Gensen-choshuhyo)</strong> - the document your company gives you at year-end, showing Payment amount and Social insurance premium amount<br>\n      &middot; If you do not have it, a <strong>pay stub</strong> works too. Total up one full year (or however long you worked) yourself\n    </p>\n\n    <div style=\"border-top:1px dashed var(--border);margin:10px 0\"></div>\n\n    <p style=\"margin-bottom:8px\"><strong>Part 1: How to use the Furusato Nozei tab (3 steps)</strong></p>\n    <p style=\"margin-bottom:10px\">\n      <strong>Step 1.</strong> In Annual income (salary income), enter the amount <u>before</u> tax and insurance premiums are deducted<br>\n      &nbsp;&nbsp;&middot; If you have a withholding statement &rarr; enter the Payment amount figure directly<br>\n      &nbsp;&nbsp;&middot; If not &rarr; total up one years worth of Total payment amount from pay stubs (excluding commuting allowance)<br>\n      &nbsp;&nbsp;&middot; If you have not worked a full year yet (e.g. new hire) &rarr; just total the months you actually worked (e.g. hired in April = 9 months, April to December)<br><br>\n      <strong>Step 2.</strong> You can <u>leave Social insurance premium blank</u> (it will auto-estimate a rough amount). If you have a withholding statement, entering the exact Social insurance premium amount makes it more accurate<br><br>\n      <strong>Step 3.</strong> For the items below (spouse, dependents, insurance deductions, etc.), only fill in what applies to you. Anything that does not apply can stay blank\n    </p>\n    <p style=\"margin-bottom:10px\">\n      Once entered, the <strong>Furusato Nozei Limit</strong> is automatically shown on the right. Donating up to this amount keeps your real out-of-pocket cost at just 2,000 yen.\n    </p>\n\n    <div style=\"border-top:1px dashed var(--border);margin:10px 0\"></div>\n\n    <p style=\"margin-bottom:8px\"><strong>Part 2: How to use the Social Insurance tab (3 steps)</strong></p>\n    <p style=\"margin-bottom:10px\">\n      <strong>Step 1.</strong> Choose your health insurance type (employees are usually Kyokai Kenpo or Union Kenpo. If your pay stub Health insurance field shows a union name, choose Union Kenpo)<br>\n      <strong>Step 2.</strong> In Monthly income, enter one months salary before tax and insurance are deducted (excluding commuting allowance)<br>\n      <strong>Step 3.</strong> Standard monthly remuneration fills in automatically. You can manually adjust it if you can confirm the exact value on your pay stub\n    </p>\n    <p style=\"margin-bottom:10px\">\n      For the Annual Total in the results, pressing the <strong>Apply this amount to the Furusato Nozei tab</strong> button carries it straight over to the Furusato Nozei tab.\n    </p>\n\n    <div style=\"border-top:1px dashed var(--border);margin:10px 0\"></div>\n\n    <p style=\"margin-bottom:6px\"><strong>&#10067; FAQ</strong></p>\n    <p style=\"margin-bottom:0\">\n      <strong>Q. There is an item I do not understand</strong><br>\n      &rarr; Leaving it blank, unfilled, or at 0 is fine. Fill in only what you know and you will still get an estimated result.<br>\n      <strong>Q. Is this result completely accurate?</strong><br>\n      &rarr; It is only an estimate. Please make your final decision based on the actual figures on your withholding statement.\n    </p>\n"};
+var curLang='ja';
+function t(str){ if(curLang==='ja')return str; var e=I18N[str]; return e?(curLang==='zh'?e[0]:e[1]):str; }
+var _i18nNodes=null;
+function _collectI18nNodes(){
+  _i18nNodes=[];
+  var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+  var n;
+  while(n=walker.nextNode()){
+    var p=n.parentNode;
+    if(!p||p.nodeName==='SCRIPT'||p.nodeName==='STYLE')continue;
+    var raw=n.data;
+    var mm=raw.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    var core=mm?mm[2]:raw.trim();
+    if(core&&I18N[core]){
+      _i18nNodes.push({node:n,core:core,lead:mm?mm[1]:'',trail:mm?mm[3]:''});
+    }
+  }
+}
+var _i18nAttrs=[
+  {id:'si',attr:'placeholder',ja:'空欄=自動計算'}
+];
+function applyLang(lang){
+  curLang=lang;
+  if(!_i18nNodes)_collectI18nNodes();
+  _i18nNodes.forEach(function(o){
+    o.node.data=o.lead+t(o.core)+o.trail;
+  });
+  _i18nAttrs.forEach(function(a){
+    var el=document.getElementById(a.id);
+    if(el)el.setAttribute(a.attr,t(a.ja));
+  });
+  var gb=document.getElementById('guide_b');
+  if(gb)gb.innerHTML=GUIDE_HTML[lang]||GUIDE_HTML.ja;
+  document.title=t('給与・控除シミュレーター');
+  document.querySelectorAll('.lang-btn').forEach(function(b){
+    b.classList.toggle('active',b.getAttribute('data-lang')===lang);
+  });
+  if(typeof calc==='function')calc();
+  if(typeof hCalc==='function')hCalc();
+}
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.lang-btn').forEach(function(b){
+    b.addEventListener('click',function(){applyLang(this.getAttribute('data-lang'));});
+  });
+});
 // ===== SHARED HELPERS =====
 function gv(id,def){var v=parseFloat(document.getElementById(id).value);return isNaN(v)?(def||0):v;}
 function gs(id){return document.getElementById(id).value;}
@@ -489,26 +603,26 @@ function addDep(type){
   div.className='dep-row'+(type==='ov'?' ov':'');
   div.id='dep'+id;
   if(type==='dom'){
-    div.innerHTML='<div><label>区分</label><select id="dt'+id+'">'
-      +'<option value="g">一般扶養（16〜18歳/23〜69歳）</option>'
-      +'<option value="sp">特定扶養（19〜22歳）</option>'
-      +'<option value="e">老人扶養（70歳以上）</option>'
-      +'<option value="ce">同居老人扶養（70歳以上）</option>'
+    div.innerHTML='<div><label>'+t('区分')+'</label><select id="dt'+id+'">'
+      +'<option value="g">'+t('一般扶養（16〜18歳/23〜69歳）')+'</option>'
+      +'<option value="sp">'+t('特定扶養（19〜22歳）')+'</option>'
+      +'<option value="e">'+t('老人扶養（70歳以上）')+'</option>'
+      +'<option value="ce">'+t('同居老人扶養（70歳以上）')+'</option>'
       +'</select></div>'
-      +'<div><label>人数</label><select id="dn'+id+'">'
-      +'<option value="1">1人</option><option value="2">2人</option>'
-      +'<option value="3">3人</option></select></div>'
+      +'<div><label>'+t('人数')+'</label><select id="dn'+id+'">'
+      +'<option value="1">'+t('1人')+'</option><option value="2">'+t('2人')+'</option>'
+      +'<option value="3">'+t('3人')+'</option></select></div>'
       +'<button class="del-btn" onclick="document.getElementById(\'dep'+id+'\').remove();calc()">×</button>';
   }else{
-    div.innerHTML='<div><label>年齢区分</label><select id="da'+id+'">'
-      +'<option value="u">16歳未満（控除対象外）</option>'
-      +'<option value="y">16〜29歳/70歳以上</option>'
-      +'<option value="m">30〜69歳（条件付き）</option>'
-      +'<option value="o">70歳以上</option>'
+    div.innerHTML='<div><label>'+t('年齢区分')+'</label><select id="da'+id+'">'
+      +'<option value="u">'+t('16歳未満（控除対象外）')+'</option>'
+      +'<option value="y">'+t('16〜29歳/70歳以上')+'</option>'
+      +'<option value="m">'+t('30〜69歳（条件付き）')+'</option>'
+      +'<option value="o">'+t('70歳以上')+'</option>'
       +'</select></div>'
-      +'<div><label>30-69歳の条件</label><select id="dc'+id+'">'
-      +'<option value="">該当なし</option>'
-      +'<option value="y">留学・障害・38万送金</option>'
+      +'<div><label>'+t('30-69歳の条件')+'</label><select id="dc'+id+'">'
+      +'<option value="">'+t('該当なし')+'</option>'
+      +'<option value="y">'+t('留学・障害・38万送金')+'</option>'
       +'</select></div>'
       +'<button class="del-btn" onclick="document.getElementById(\'dep'+id+'\').remove();calc()">×</button>';
   }
@@ -550,7 +664,7 @@ function estSI(inc,kaigo){
   var nenkinHyo=Math.min(hyo,650000);
   var n=nenkinHyo*0.183/2;
   var ei=Math.min(Math.max(Math.round(inc/12),63000),1370000);
-  var emp=ei*0.006;
+  var emp=ei*0.005;
   return (h+n+emp)*12;
 }
 function calcIns(ln,cn,an,lo,ao){
@@ -643,8 +757,8 @@ function adjDeduct(taxRes,pdiff){
 
 function rows(arr){return arr.map(function(a){return '<div class="row"><span class="n">'+a[0]+'</span><span class="v">'+a[1]+'</span></div>';}).join('');}
 function dedRows(arr,total){
-  var h=arr.map(function(a){var v=a[1];return '<div class="row"><span class="n">'+a[0]+'</span><span class="v'+(v>0?'':' off')+'">'+( v>0?'▲'+fmt(v)+'円':'—')+'</span></div>';}).join('');
-  h+='<div class="row bold"><span class="n">合計控除額</span><span class="v">▲'+fmt(Math.round(total))+'円</span></div>';
+  var h=arr.map(function(a){var v=a[1];return '<div class="row"><span class="n">'+a[0]+'</span><span class="v'+(v>0?'':' off')+'">'+( v>0?'▲'+fmt(v)+t('円'):'—')+'</span></div>';}).join('');
+  h+='<div class="row bold"><span class="n">'+t('合計控除額')+'</span><span class="v">▲'+fmt(Math.round(total))+t('円')+'</span></div>';
   return h;
 }
 function mkrow(n,v,cls,bold){return '<div class="row'+(bold?' bold':'')+'"><span class="n">'+n+'</span><span class="v '+(cls||'')+'">'+v+'</span></div>';}
@@ -655,9 +769,9 @@ function calc(){
     if(incRaw===''||incRaw===null||parseFloat(incRaw)<=0){
       setText('r_limit','—');setText('r_net','—');
       var pb=document.getElementById('r_pb');if(pb)pb.style.width='0%';
-      setText('r_use_txt','年収を入力すると表示されます');
+      setText('r_use_txt',t('年収を入力すると表示されます'));
       setHTML('r_base','');setHTML('r_di','');setHTML('r_dr','');setHTML('r_sav','');
-      setHTML('r_notes','💡 年収（給与収入）を入力してください。');
+      setHTML('r_notes',t('💡 年収（給与収入）を入力してください。'));
       setText('si_auto_info','');
       return;
     }
@@ -667,7 +781,7 @@ function calc(){
     var kaigo=gc('kaigo_flag');
     var si=(isNaN(siInp)||siInp<0)?estSI(inc,kaigo):siInp*10000;
     var siIsAuto=(isNaN(siInp)||siInp<0);
-    if(siIsAuto){setText('si_auto_info','社会保険料 自動推計: 約'+fmt(Math.round(si/10000))+'万円（健保+厚年+雇保）');}
+    if(siIsAuto){setText('si_auto_info',t('社会保険料 自動推計: 約')+fmt(Math.round(si/10000))+t('万円（健保+厚年+雇保）'));}
     else{setText('si_auto_info','');}
     var ed=empDed(inc),salInc=inc-ed,basic=basicDed(salInc);
     var ins=calcIns(gv('ins_ln'),gv('ins_cn'),gv('ins_an'),gv('ins_lo'),gv('ins_ao'));
@@ -696,30 +810,30 @@ function calc(){
     if(denom>0&&resAlloc>0){limit=Math.floor(resAlloc*0.20/denom)+2000;}
     setText('r_limit',fmt(limit));
     var net=2000-Math.floor((limit-2000)*0.30);
-    setText('r_net',(net<0?'▲'+fmt(-net):fmt(net))+'円');
+    setText('r_net',(net<0?'▲'+fmt(-net):fmt(net))+t('円'));
     var don=gv('donation',0),cities=gv('cities',3);
     if(don>0&&limit>0){
       var pct=Math.min(don/limit*100,150),bar=document.getElementById('r_pb');
       if(bar){bar.style.width=Math.min(pct,100)+'%';bar.className='pb'+(pct>100?' over':'');}
       var rem=limit-don;
-      setHTML('r_use_txt','予定 <strong>'+fmt(don)+'円</strong> / 上限 <strong>'+fmt(limit)+'円</strong> — '+(rem>=0?'あと <strong style="color:var(--green)">'+fmt(rem)+'円</strong>':'<strong style="color:var(--red)">'+fmt(-rem)+'円超過</strong>'));
-    }else{var pb=document.getElementById('r_pb');if(pb)pb.style.width='0%';setText('r_use_txt','寄付予定額を入力すると表示されます');}
+      setHTML('r_use_txt',t('予定')+' <strong>'+fmt(don)+t('円')+'</strong> / '+t('上限')+' <strong>'+fmt(limit)+t('円')+'</strong> — '+(rem>=0?t('あと')+' <strong style="color:var(--green)">'+fmt(rem)+t('円')+'</strong>':'<strong style="color:var(--red)">'+fmt(-rem)+t('円')+t('超過')+'</strong>'));
+    }else{var pb=document.getElementById('r_pb');if(pb)pb.style.width='0%';setText('r_use_txt',t('寄付予定額を入力すると表示されます'));}
     var siMark=siIsAuto?'<span style="font-size:10px;color:var(--muted)">(自動)</span>':'';
-    setHTML('r_base',rows([['給与収入',fmt(inc)+'円'],['▲給与所得控除',fmt(ed)+'円'],['給与所得',fmt(salInc)+'円'],['▲社会保険料控除',fmt(Math.round(si))+'円'+siMark],['所得税 課税所得','<strong>'+fmt(taxInc)+'円</strong>'],['限界税率（ふるさと納税計算用）','<strong>'+(itax.rate*100).toFixed(0)+'%</strong>'],['住民税 課税所得','<strong>'+fmt(taxRes)+'円</strong>'],['住民税所得割（10%）',fmt(resBase)+'円'],['▲調整控除',fmt(adj)+'円'],['▲住宅ローン控除（住民税）',fmt(hlRes)+'円'],['住民税所得割（計算用）','<strong>'+fmt(resAlloc)+'円</strong>']]));
-    var di=[['基礎控除',basic.i,0],['社会保険料控除',Math.round(si),0],['生命保険料控除',ins.i,0],['地震保険料控除',quake.i,0],['配偶者控除/特別控除',sp.i,0],['国内扶養控除',dd.i,0],['海外扶養控除',od.i,0],['iDeCo掛金控除',ideco,0],['医療費控除'+(gc('selfmed_sw')?' (SMT)':''),medD,0],['障害者控除',disI,0],['ひとり親控除',spI,0],['寡婦控除',wI,0],['勤労学生控除',stI,0]];
+    setHTML('r_base',rows([[t('給与収入'),fmt(inc)+t('円')],[t('▲給与所得控除'),fmt(ed)+t('円')],[t('給与所得'),fmt(salInc)+t('円')],[t('▲社会保険料控除'),fmt(Math.round(si))+t('円')+siMark],[t('所得税 課税所得'),'<strong>'+fmt(taxInc)+t('円')+'</strong>'],[t('限界税率（ふるさと納税計算用）'),'<strong>'+(itax.rate*100).toFixed(0)+'%</strong>'],[t('住民税 課税所得'),'<strong>'+fmt(taxRes)+t('円')+'</strong>'],[t('住民税所得割（10%）'),fmt(resBase)+t('円')],[t('▲調整控除'),fmt(adj)+t('円')],[t('▲住宅ローン控除（住民税）'),fmt(hlRes)+t('円')],[t('住民税所得割（計算用）'),'<strong>'+fmt(resAlloc)+t('円')+'</strong>']]));
+    var di=[[t('基礎控除'),basic.i,0],[t('社会保険料控除'),Math.round(si),0],[t('生命保険料控除'),ins.i,0],[t('地震保険料控除'),quake.i,0],[t('配偶者控除/特別控除'),sp.i,0],[t('国内扶養控除'),dd.i,0],[t('海外扶養控除'),od.i,0],[t('iDeCo掛金控除'),ideco,0],[t('医療費控除')+(gc('selfmed_sw')?' (SMT)':''),medD,0],[t('障害者控除'),disI,0],[t('ひとり親控除'),spI,0],[t('寡婦控除'),wI,0],[t('勤労学生控除'),stI,0]];
     setHTML('r_di',dedRows(di,sumI));
-    var dr=[['基礎控除',basic.r,0],['社会保険料控除',Math.round(si),0],['生命保険料控除',ins.r,0],['地震保険料控除',quake.r,0],['配偶者控除/特別控除',sp.r,0],['国内扶養控除',dd.r,0],['海外扶養控除',od.r,0],['iDeCo掛金控除',ideco,0],['医療費控除'+(gc('selfmed_sw')?' (SMT)':''),medD,0],['障害者控除',disR,0],['ひとり親控除',spR,0],['寡婦控除',wR,0],['勤労学生控除',stR,0]];
+    var dr=[[t('基礎控除'),basic.r,0],[t('社会保険料控除'),Math.round(si),0],[t('生命保険料控除'),ins.r,0],[t('地震保険料控除'),quake.r,0],[t('配偶者控除/特別控除'),sp.r,0],[t('国内扶養控除'),dd.r,0],[t('海外扶養控除'),od.r,0],[t('iDeCo掛金控除'),ideco,0],[t('医療費控除')+(gc('selfmed_sw')?' (SMT)':''),medD,0],[t('障害者控除'),disR,0],[t('ひとり親控除'),spR,0],[t('寡婦控除'),wR,0],[t('勤労学生控除'),stR,0]];
     setHTML('r_dr',dedRows(dr,sumR));
     var base=Math.max(0,limit-2000),sIt=Math.floor(base*itax.rate*1.021),sRb=Math.floor(base*0.10),sRs=Math.floor(base*(0.90-itax.rate*1.021));
-    setHTML('r_sav',mkrow('所得税還付（復興特別所得税込）','+'+fmt(sIt)+'円','g')+mkrow('住民税控除（基本分10%）','+'+fmt(sRb)+'円','g')+mkrow('住民税控除（特例分）','+'+fmt(sRs)+'円','g')+mkrow('控除合計','+'+fmt(sIt+sRb+sRs)+'円','g',true)+mkrow('自己負担（実質コスト）','2,000円','o',true));
+    setHTML('r_sav',mkrow(t('所得税還付（復興特別所得税込）'),'+'+fmt(sIt)+t('円'),'g')+mkrow(t('住民税控除（基本分10%）'),'+'+fmt(sRb)+t('円'),'g')+mkrow(t('住民税控除（特例分）'),'+'+fmt(sRs)+t('円'),'g')+mkrow(t('控除合計'),'+'+fmt(sIt+sRb+sRs)+t('円'),'g',true)+mkrow(t('自己負担（実質コスト）'),'2,000'+t('円'),'o',true));
     var notes=[];
-    if(siIsAuto)notes.push('📌 社会保険料は自動概算です。「社会保険料タブ」で正確な計算後に反映するか、源泉徴収票の値を直接入力してください。');
-    if(cities>5)notes.push('⚠️ '+cities+'自治体 → ワンストップ特例不可。確定申告が必要です。');
-    else notes.push('✅ '+cities+'自治体以内 → ワンストップ特例利用可（確定申告不要）。');
-    if(od.i>0)notes.push('✈️ 海外扶養を計上。確定申告に親族関係書類・送金記録の添付が必要です。');
-    if(hlRes>0)notes.push('🏠 住宅ローン控除（住民税分）が上限計算に影響しています。');
-    if(ideco>0)notes.push('💡 iDeCoは全額所得控除。課税所得が下がり、ふるさと納税上限にも影響します。');
-    notes.push('📊 この計算は概算です。最終確認は源泉徴収票の実数値で行ってください。');
+    if(siIsAuto)notes.push(t('📌 社会保険料は自動概算です。「社会保険料タブ」で正確な計算後に反映するか、源泉徴収票の値を直接入力してください。'));
+    if(cities>5)notes.push('⚠️ '+cities+t('自治体 → ワンストップ特例不可。確定申告が必要です。'));
+    else notes.push('✅ '+cities+t('自治体以内 → ワンストップ特例利用可（確定申告不要）。'));
+    if(od.i>0)notes.push(t('✈️ 海外扶養を計上。確定申告に親族関係書類・送金記録の添付が必要です。'));
+    if(hlRes>0)notes.push(t('🏠 住宅ローン控除（住民税分）が上限計算に影響しています。'));
+    if(ideco>0)notes.push(t('💡 iDeCoは全額所得控除。課税所得が下がり、ふるさと納税上限にも影響します。'));
+    notes.push(t('📊 この計算は概算です。最終確認は源泉徴収票の実数値で行ってください。'));
     setHTML('r_notes',notes.join('<br>'));
   }catch(e){console.error('calc error:',e);setHTML('r_notes','計算エラー: '+e.message);}
 }
@@ -811,7 +925,7 @@ function hCalc(){
     if((monthlyRaw===''||monthlyRaw===null)&&(hyoRaw===''||hyoRaw===null||parseFloat(hyoRaw)<=0)){
       setText('h_total_monthly','—');setText('h_total_annual','—');
       setHTML('h_breakdown','');setHTML('h_basis','');
-      setHTML('h_notes','💡 月収（税引前）を入力してください。標準報酬月額が自動換算されます。');
+      setHTML('h_notes',t('💡 月収（税引前）を入力してください。標準報酬月額が自動換算されます。'));
       document.getElementById('ref-to-furusato-btn')._annual=0;
       return;
     }
@@ -821,7 +935,7 @@ function hCalc(){
     var nenkinHyo=Math.min(hyo,650000);
     var wage=gv('h_wage_emp',0);  // 円単位で入力
     var empTypeVal=gs('h_emp_type');
-    var empRate=parseFloat(empTypeVal)||0.006;
+    var empRate=parseFloat(empTypeVal)||0.005;
     var KAIGO=0.01730;
     var NENKIN=0.1830;
 
@@ -834,47 +948,47 @@ function hCalc(){
       var pref=gs('h_pref');
       var rate=KYOKAI_RATES[pref]||0.1029;
       kenpo=Math.round(hyo*(rate/2));
-      kenpoLabel='協会けんぽ（'+(rate*100).toFixed(2)+'% / 本人'+(rate/2*100).toFixed(3)+'%）';
+      kenpoLabel=t('協会けんぽ（')+(rate*100).toFixed(2)+t('% / 本人')+(rate/2*100).toFixed(3)+t('%）');
     }else if(insType==='kumiai'){
       var r=gv('h_kumiai_rate',4.900)/100;
       kenpo=Math.round(hyo*r);
-      kenpoLabel='組合健保（本人負担 '+(r*100).toFixed(3)+'%）';
+      kenpoLabel=t('組合健保（本人負担 ')+(r*100).toFixed(3)+t('%）');
     }else{
       kenpo=gv('h_kokuho_monthly',30000);
       kaigoPrem=0;
-      kenpoLabel='国民健康保険（手動入力）';
+      kenpoLabel=t('国民健康保険（手動入力）');
     }
 
     var total=kenpo+(kaigo?kaigoPrem:0)+nenkin+emp;
     var annual=total*12;
 
     setText('h_total_monthly',fmt(total));
-    setText('h_total_annual',fmt(annual)+'円');
+    setText('h_total_annual',fmt(annual)+t('円'));
 
     var br='';
-    br+='<div class="row"><span class="n">健康保険料（本人）</span><span class="v">'+fmt(kenpo)+'円</span></div>';
-    if(kaigo&&insType!=='kokuho'){br+='<div class="row"><span class="n">介護保険料（本人）</span><span class="v">'+fmt(kaigoPrem)+'円</span></div>';}
-    if(insType!=='kokuho'){br+='<div class="row"><span class="n">厚生年金保険料（本人）</span><span class="v">'+fmt(nenkin)+'円</span></div>';}
-    br+='<div class="row"><span class="n">雇用保険料（本人）</span><span class="v">'+fmt(emp)+'円</span></div>';
-    br+='<div class="row bold"><span class="n">合計（月額）</span><span class="v">'+fmt(total)+'円</span></div>';
-    br+='<div class="row" style="background:#f0fdf4"><span class="n">年間合計</span><span class="v" style="color:var(--green);font-size:14px">'+fmt(annual)+'円</span></div>';
+    br+='<div class="row"><span class="n">'+t('健康保険料（本人）')+'</span><span class="v">'+fmt(kenpo)+t('円')+'</span></div>';
+    if(kaigo&&insType!=='kokuho'){br+='<div class="row"><span class="n">'+t('介護保険料（本人）')+'</span><span class="v">'+fmt(kaigoPrem)+t('円')+'</span></div>';}
+    if(insType!=='kokuho'){br+='<div class="row"><span class="n">'+t('厚生年金保険料（本人）')+'</span><span class="v">'+fmt(nenkin)+t('円')+'</span></div>';}
+    br+='<div class="row"><span class="n">'+t('雇用保険料（本人）')+'</span><span class="v">'+fmt(emp)+t('円')+'</span></div>';
+    br+='<div class="row bold"><span class="n">'+t('合計（月額）')+'</span><span class="v">'+fmt(total)+t('円')+'</span></div>';
+    br+='<div class="row" style="background:#f0fdf4"><span class="n">'+t('年間合計')+'</span><span class="v" style="color:var(--green);font-size:14px">'+fmt(annual)+t('円')+'</span></div>';
     setHTML('h_breakdown',br);
 
     var basis='';
-    basis+='<div class="row"><span class="n">標準報酬月額</span><span class="v">'+fmt(hyo)+'円</span></div>';
-    if(insType!=='kokuho'){basis+='<div class="row"><span class="n">厚生年金 標準報酬月額（上限65万）</span><span class="v">'+fmt(nenkinHyo)+'円</span></div>';}
-    basis+='<div class="row"><span class="n">健康保険種別</span><span class="v" style="font-size:11px;min-width:auto">'+kenpoLabel+'</span></div>';
-    if(insType!=='kokuho'){basis+='<div class="row"><span class="n">厚生年金保険料率（折半）</span><span class="v">9.15%</span></div>';}
-    if(kaigo&&insType!=='kokuho'){basis+='<div class="row"><span class="n">介護保険料率（折半）</span><span class="v">0.865%</span></div>';}
-    basis+='<div class="row"><span class="n">雇用保険料率（本人）</span><span class="v">'+(empRate*100).toFixed(1)+'%</span></div>';
-    basis+='<div class="row" style="border-bottom:none"><span class="n">雇用保険計算基礎賃金</span><span class="v">'+fmt(wage)+'円</span></div>';
+    basis+='<div class="row"><span class="n">'+t('標準報酬月額')+'</span><span class="v">'+fmt(hyo)+t('円')+'</span></div>';
+    if(insType!=='kokuho'){basis+='<div class="row"><span class="n">'+t('厚生年金 標準報酬月額（上限65万）')+'</span><span class="v">'+fmt(nenkinHyo)+t('円')+'</span></div>';}
+    basis+='<div class="row"><span class="n">'+t('健康保険種別')+'</span><span class="v" style="font-size:11px;min-width:auto">'+kenpoLabel+'</span></div>';
+    if(insType!=='kokuho'){basis+='<div class="row"><span class="n">'+t('厚生年金保険料率（折半）')+'</span><span class="v">9.15%</span></div>';}
+    if(kaigo&&insType!=='kokuho'){basis+='<div class="row"><span class="n">'+t('介護保険料率（折半）')+'</span><span class="v">0.865%</span></div>';}
+    basis+='<div class="row"><span class="n">'+t('雇用保険料率（本人）')+'</span><span class="v">'+(empRate*100).toFixed(1)+'%</span></div>';
+    basis+='<div class="row" style="border-bottom:none"><span class="n">'+t('雇用保険計算基礎賃金')+'</span><span class="v">'+fmt(wage)+t('円')+'</span></div>';
     setHTML('h_basis',basis);
 
     var notes=[];
-    notes.push('✅ 計算結果は概算です。実際の保険料は標準報酬月額の等級区分によって端数が異なります。');
-    if(hyo>=1390000)notes.push('ℹ️ 健康保険の標準報酬月額の上限（139万円）に達しています。');
-    if(nenkinHyo>=650000)notes.push('ℹ️ 厚生年金の標準報酬月額の上限（65万円）に達しています。');
-    if(insType==='kumiai')notes.push('📌 組合健保の料率は毎年変更されます。給与明細で実際の控除額を必ず確認してください。');
+    notes.push(t('✅ 計算結果は概算です。実際の保険料は標準報酬月額の等級区分によって端数が異なります。'));
+    if(hyo>=1390000)notes.push(t('ℹ️ 健康保険の標準報酬月額の上限（139万円）に達しています。'));
+    if(nenkinHyo>=650000)notes.push(t('ℹ️ 厚生年金の標準報酬月額の上限（65万円）に達しています。'));
+    if(insType==='kumiai')notes.push(t('📌 組合健保の料率は毎年変更されます。給与明細で実際の控除額を必ず確認してください。'));
     setHTML('h_notes',notes.join('<br>'));
 
     // Store annual for reflect button
@@ -921,9 +1035,9 @@ document.getElementById('ref-to-furusato-btn').addEventListener('click',function
   document.getElementById('pane-f').classList.add('active');
   calc();
   var btn=document.getElementById('ref-to-furusato-btn');
-  btn.textContent='✅ 反映しました！ふるさと納税タブで確認してください';
+  btn.textContent=t('✅ 反映しました！ふるさと納税タブで確認してください');
   btn.style.background='#16a34a';
-  setTimeout(function(){btn.textContent='🏠 この金額をふるさと納税タブに反映する';btn.style.background='';},3000);
+  setTimeout(function(){btn.textContent=t('🏠 この金額をふるさと納税タブに反映する');btn.style.background='';},3000);
 });
 
 // 初期計算（空欄なら「—」表示）
